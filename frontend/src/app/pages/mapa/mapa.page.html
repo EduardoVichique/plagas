@@ -1,0 +1,13 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mapa de reportes</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div *ngIf="loading" class="text-center py-3">
+    <ion-spinner></ion-spinner>
+    <p class="small">Cargando reportes...</p>
+  </div>
+  <div #mapContainer id="map" class="map-container" [class.loaded]="!loading"></div>
+  <p class="small text-muted mt-2 mb-0">{{ reportes.length }} reportes con ubicación en el mapa</p>
+</ion-content>

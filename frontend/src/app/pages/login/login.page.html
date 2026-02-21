@@ -1,0 +1,26 @@
+<ion-content class="ion-padding">
+  <div class="d-flex flex-column min-vh-100 justify-content-center align-items-center py-5">
+    <div class="plaga-card w-100" style="max-width: 400px;">
+      <div class="text-center mb-4">
+        <ion-icon name="leaf" style="font-size: 48px; color: var(--ion-color-primary);"></ion-icon>
+        <h1 class="h3 mt-2 mb-0">PlagaControl</h1>
+        <p class="text-muted small">Control y reporte de plagas agrícolas</p>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <ion-item lines="none" class="ion-no-padding mb-3">
+          <ion-input formControlName="email" type="email" label="Email" labelPlacement="stacked" placeholder="tu@email.com"></ion-input>
+        </ion-item>
+        <ion-item lines="none" class="ion-no-padding mb-3">
+          <ion-input formControlName="password" type="password" label="Contraseña" labelPlacement="stacked" placeholder="Mínimo 6 caracteres"></ion-input>
+        </ion-item>
+        <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
+        <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
+          {{ loading ? 'Entrando...' : 'Iniciar sesión' }}
+        </ion-button>
+      </form>
+      <p class="text-center mt-3 mb-0">
+        <a (click)="goRegistro()" class="text-primary" style="cursor: pointer;">¿No tienes cuenta? Regístrate</a>
+      </p>
+    </div>
+  </div>
+</ion-content>

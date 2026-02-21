@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/reportes"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Reporte</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div *ngIf="loading" class="text-center py-5">
+    <ion-spinner></ion-spinner>
+  </div>
+  <div *ngIf="!loading && reporte" class="plaga-card mb-3">
+    <img *ngIf="reporte.imagen_url" [src]="reporte.imagen_url" alt="" class="img-fluid rounded mb-2" style="max-height: 200px; object-fit: cover; width: 100%;" />
+    <h2 class="h5 mb-1">{{ reporte.titulo }}</h2>
+    <p class="small text-muted mb-1">{{ reporte.estado }} · {{ reporte.tipo_plaga || 'Sin tipo' }} · {{ reporte.created_at | date:'medium' }}</p>
+    <p class="mb-2">{{ reporte.descripcion || 'Sin descripción' }}</p>
+    <p *ngIf="reporte.Usuario" class="small mb-0">Por {{ reporte.Usuario.nombre }} {{ reporte.Usuario.apellido || '' }}</p>
+  </div>
+  <div *ngIf="!loading && reporte" class="plaga-card">
+    <h3 class="h6 mb-2">Comentarios ({{ reporte.Comentarios?.length || 0 }})</h3>
+    <ion-item lines="none" class="ion-no-padding mb-2">
+      <ion-textarea [(ngModel)]="nuevoComentario" placeholder="Escribe un comentario..." rows="2"></ion-textarea>
+    </ion-item>
+    <ion-button size="small" (click)="enviarComentario()" [disabled]="enviandoComentario || !nuevoComentario.trim()" class="btn-plaga">
+      Enviar
+    </ion-button>
+    <ion-list lines="none" class="mt-3">
+      <ion-item *ngFor="let c of reporte.Comentarios" lines="full">
+        <ion-label>
+          <p class="fw-bold small">{{ c.Usuario?.nombre }}</p>
+          <p>{{ c.contenido }}</p>
+          <p class="small text-muted">{{ c.created_at | date:'short' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

@@ -1,0 +1,31 @@
+// PlagaControl - Tema verde agrícola
+$plaga-primary: #2d6a4f;
+$plaga-primary-dark: #1b4332;
+$plaga-primary-light: #40916c;
+$plaga-secondary: #95d5b2;
+$plaga-accent: #52b788;
+$plaga-background: #f1faee;
+$plaga-card-bg: #ffffff;
+$plaga-text: #1b4332;
+$plaga-text-muted: #40916c;
+
+:root {
+  --ion-color-primary: #{$plaga-primary};
+  --ion-color-primary-rgb: 45, 106, 79;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #285f47;
+  --ion-color-primary-tint: #427961;
+
+  --ion-color-secondary: #{$plaga-secondary};
+  --ion-color-secondary-rgb: 149, 213, 178;
+  --ion-color-secondary-contrast: #1b4332;
+  --ion-color-secondary-contrast-rgb: 27, 67, 50;
+  --ion-color-secondary-shade: #83bb9e;
+  --ion-color-secondary-tint: #a0d9ba;
+
+  --ion-background-color: #{$plaga-background};
+  --ion-text-color: #{$plaga-text};
+  --plaga-card-radius: 16px;
+  --plaga-shadow: 0 4px 12px rgba(27, 67, 50, 0.08);
+}

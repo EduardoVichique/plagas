@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>PlagaControl</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="mb-3">
+    <h2 class="h5 mb-1">Bienvenido</h2>
+    <p *ngIf="user$ | async as user" class="text-muted small mb-0">{{ user.nombre }} {{ user.apellido || '' }}</p>
+  </div>
+  <div class="plaga-card mb-3">
+    <h3 class="h6 mb-2">Acciones rápidas</h3>
+    <div class="d-grid gap-2">
+      <ion-button expand="block" (click)="goReporteNuevo()" class="btn-plaga">
+        <ion-icon name="add-circle" slot="start"></ion-icon>
+        Nuevo reporte de plaga
+      </ion-button>
+      <ion-button fill="outline" (click)="goMapa()">
+        <ion-icon name="map" slot="start"></ion-icon>
+        Ver mapa
+      </ion-button>
+      <ion-button fill="outline" (click)="goGuias()">
+        <ion-icon name="book" slot="start"></ion-icon>
+        Guías de plagas
+      </ion-button>
+    </div>
+  </div>
+  <div class="plaga-card">
+    <h3 class="h6 mb-2">Reportes recientes</h3>
+    <div *ngIf="loading" class="text-center py-3">
+      <ion-spinner></ion-spinner>
+    </div>
+    <ion-list *ngIf="!loading && reportesRecientes.length">
+      <ion-item *ngFor="let r of reportesRecientes" button (click)="goReporte(r.id)" detail>
+        <ion-label>
+          <h4>{{ r.titulo }}</h4>
+          <p>{{ r.estado }} · {{ r.created_at | date:'short' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+    <p *ngIf="!loading && !reportesRecientes.length" class="text-muted small mb-0">Aún no hay reportes. Crea el primero.</p>
+  </div>
+</ion-content>

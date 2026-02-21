@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/foro"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Tema</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div *ngIf="loading" class="text-center py-5">
+    <ion-spinner></ion-spinner>
+  </div>
+  <div *ngIf="!loading && tema" class="plaga-card mb-3">
+    <h2 class="h5 mb-1">{{ tema.titulo }}</h2>
+    <p class="small text-muted mb-2">{{ tema.Usuario?.nombre }} · {{ tema.created_at | date:'medium' }}</p>
+    <p class="mb-2">{{ tema.contenido }}</p>
+    <ion-button fill="clear" size="small" (click)="ayudaTema()">
+      <ion-icon name="thumbs-up-outline"></ion-icon>
+      {{ tema.ayudas_count ?? 0 }} ayudas
+    </ion-button>
+  </div>
+  <div *ngIf="!loading && tema" class="plaga-card mb-3">
+    <h3 class="h6 mb-2">Responder</h3>
+    <ion-textarea [(ngModel)]="nuevoRespuesta" placeholder="Escribe tu respuesta..." rows="3"></ion-textarea>
+    <ion-button expand="block" class="btn-plaga mt-2" (click)="enviarRespuesta()" [disabled]="enviando || !nuevoRespuesta.trim()">
+      {{ enviando ? 'Enviando...' : 'Enviar respuesta' }}
+    </ion-button>
+  </div>
+  <div *ngIf="!loading && tema">
+    <h3 class="h6 mb-2">Respuestas ({{ respuestas.length }})</h3>
+    <div class="plaga-card mb-2" *ngFor="let r of respuestas">
+      <p class="fw-bold small mb-1">{{ r.Usuario?.nombre }}</p>
+      <p class="mb-1">{{ r.contenido }}</p>
+      <ion-button fill="clear" size="small" (click)="ayudaRespuesta(r)">
+        <ion-icon name="thumbs-up-outline"></ion-icon>
+        {{ r.ayudas_count ?? 0 }}
+      </ion-button>
+      <p class="small text-muted mb-0">{{ r.created_at | date:'short' }}</p>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mi perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div *ngIf="loading" class="text-center py-5">
+    <ion-spinner></ion-spinner>
+  </div>
+  <div *ngIf="!loading && perfil" class="perfil-container">
+    <div class="plaga-card text-center mb-3">
+      <div class="avatar-wrap mb-2">
+        <img *ngIf="perfil.user?.avatar_url" [src]="perfil.user.avatar_url" alt="Avatar" class="avatar-img" />
+        <ion-icon *ngIf="!perfil.user?.avatar_url" name="person-circle" class="avatar-icon"></ion-icon>
+      </div>
+      <h2 class="h5 mb-1">{{ perfil.user?.nombre }} {{ perfil.user?.apellido || '' }}</h2>
+      <p class="text-muted small mb-0">{{ perfil.user?.email }}</p>
+      <p class="mt-2 mb-0">
+        <span class="badge bg-primary">{{ perfil.user?.experiencia || 'Principiante' }}</span>
+        <span *ngIf="perfil.user?.tipo_cultivo" class="badge bg-secondary ms-1">{{ perfil.user.tipo_cultivo }}</span>
+      </p>
+    </div>
+    <div class="plaga-card mb-3">
+      <h3 class="h6 mb-2">Estadísticas</h3>
+      <div class="row text-center">
+        <div class="col-4">
+          <div class="h5 mb-0 text-primary">{{ perfil.stats?.reportes ?? 0 }}</div>
+          <small class="text-muted">Reportes</small>
+        </div>
+        <div class="col-4">
+          <div class="h5 mb-0 text-primary">{{ perfil.stats?.temas_foro ?? 0 }}</div>
+          <small class="text-muted">Temas</small>
+        </div>
+        <div class="col-4">
+          <div class="h5 mb-0 text-primary">{{ perfil.stats?.respuestas ?? 0 }}</div>
+          <small class="text-muted">Respuestas</small>
+        </div>
+      </div>
+    </div>
+    <div class="plaga-card mb-3">
+      <h3 class="h6 mb-2">Actividad reciente</h3>
+      <ion-list lines="none">
+        <ion-item *ngFor="let r of perfil.actividad_reciente?.reportes" [routerLink]="['/reporte', r.id]" button>
+          <ion-icon name="document-text" slot="start"></ion-icon>
+          <ion-label>
+            <p>{{ r.titulo }}</p>
+            <p class="small text-muted">{{ r.estado }} · {{ r.created_at | date:'short' }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item *ngFor="let t of perfil.actividad_reciente?.temas" [routerLink]="['/tema', t.id]" button>
+          <ion-icon name="chatbubble" slot="start"></ion-icon>
+          <ion-label>
+            <p>{{ t.titulo }}</p>
+            <p class="small text-muted">{{ t.ayudas_count }} ayudas · {{ t.created_at | date:'short' }}</p>
+          </ion-label>
+        </ion-item>
+        <p *ngIf="!(perfil.actividad_reciente?.reportes?.length) && !(perfil.actividad_reciente?.temas?.length)" class="small text-muted mb-0 ps-2">Sin actividad reciente</p>
+      </ion-list>
+    </div>
+    <div class="plaga-card mb-3">
+      <h3 class="h6 mb-2">Preferencias</h3>
+      <p class="small text-muted mb-0">Tipo de cultivo: {{ perfil.user?.tipo_cultivo || 'No especificado' }}</p>
+      <p class="small text-muted mb-0">Experiencia: {{ perfil.user?.experiencia || 'Principiante' }}</p>
+    </div>
+    <ion-button expand="block" color="danger" fill="outline" (click)="logout()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Cerrar sesión
+    </ion-button>
+  </div>
+</ion-content>

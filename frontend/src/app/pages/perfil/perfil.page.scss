@@ -1,0 +1,16 @@
+.avatar-wrap {
+  .avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .avatar-icon {
+    font-size: 80px;
+    color: var(--ion-color-primary);
+  }
+}
+
+ion-content {
+  --background: var(--ion-background-color);
+}

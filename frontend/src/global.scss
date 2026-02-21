@@ -1,0 +1,66 @@
+// Estilos globales - PlagaControl
+@import "theme/variables.scss";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--ion-background-color);
+  color: var(--ion-text-color);
+  margin: 0;
+  padding: 0;
+}
+
+ion-content {
+  --background: #{$plaga-background};
+}
+
+// Cards redondeadas estilo agrícola
+.plaga-card {
+  border-radius: var(--plaga-card-radius);
+  box-shadow: var(--plaga-shadow);
+  background: $plaga-card-bg;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+// Barra inferior (tabs)
+ion-tab-bar {
+  --background: #{$plaga-card-bg};
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+ion-tab-button {
+  --color: #{$plaga-text-muted};
+  --color-selected: #{$plaga-primary};
+}
+
+// Botones primarios
+.btn-plaga {
+  background: $plaga-primary;
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  &:hover {
+    background: $plaga-primary-dark;
+    color: white;
+  }
+}
+
+// Headers
+ion-header {
+  --background: #{$plaga-primary};
+  --color: white;
+}
+
+ion-toolbar {
+  --background: #{$plaga-primary};
+  --color: white;
+}

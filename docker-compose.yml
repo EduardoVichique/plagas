@@ -1,0 +1,70 @@
+# PlagaControl - Docker Compose
+# Ejecutar: docker-compose up --build
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: plagacontrol-postgres
+    environment:
+      POSTGRES_DB: plagacontrol
+      POSTGRES_USER: plaga_user
+      POSTGRES_PASSWORD: plaga_pass_secure
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plaga_user -d plagacontrol"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - plagacontrol-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: plagacontrol-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      API_URL: http://localhost
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: plagacontrol
+      DB_USER: plaga_user
+      DB_PASSWORD: plaga_pass_secure
+      JWT_SECRET: plagacontrol-jwt-secret-change-in-production
+      JWT_EXPIRES_IN: 7d
+      UPLOAD_PATH: /app/uploads
+    volumes:
+      - backend_uploads:/app/uploads
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - plagacontrol-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: plagacontrol-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - plagacontrol-net
+
+volumes:
+  postgres_data:
+  backend_uploads:
+
+networks:
+  plagacontrol-net:
+    driver: bridge

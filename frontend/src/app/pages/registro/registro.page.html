@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Registro</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="plaga-card w-100 mt-3" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <ion-item lines="none" class="ion-no-padding mb-2">
+        <ion-input formControlName="nombre" label="Nombre" labelPlacement="stacked" placeholder="Tu nombre"></ion-input>
+      </ion-item>
+      <ion-item lines="none" class="ion-no-padding mb-2">
+        <ion-input formControlName="apellido" label="Apellido" labelPlacement="stacked" placeholder="Opcional"></ion-input>
+      </ion-item>
+      <ion-item lines="none" class="ion-no-padding mb-2">
+        <ion-input formControlName="email" type="email" label="Email" labelPlacement="stacked" placeholder="tu@email.com"></ion-input>
+      </ion-item>
+      <ion-item lines="none" class="ion-no-padding mb-2">
+        <ion-input formControlName="password" type="password" label="Contraseña" labelPlacement="stacked" placeholder="Mínimo 6 caracteres"></ion-input>
+      </ion-item>
+      <ion-item lines="none" class="ion-no-padding mb-2">
+        <ion-select formControlName="experiencia" label="Experiencia" labelPlacement="stacked" interface="popover">
+          <ion-select-option value="Principiante">Principiante</ion-select-option>
+          <ion-select-option value="Intermedio">Intermedio</ion-select-option>
+          <ion-select-option value="Avanzado">Avanzado</ion-select-option>
+          <ion-select-option value="Experto">Experto</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item lines="none" class="ion-no-padding mb-3">
+        <ion-input formControlName="tipo_cultivo" label="Tipo de cultivo" labelPlacement="stacked" placeholder="Ej: Maíz, Vid..."></ion-input>
+      </ion-item>
+      <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
+      <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
+        {{ loading ? 'Registrando...' : 'Crear cuenta' }}
+      </ion-button>
+    </form>
+    <p class="text-center mt-3 mb-0">
+      <a (click)="goLogin()" class="text-primary" style="cursor: pointer;">Ya tengo cuenta</a>
+    </p>
+  </div>
+</ion-content>

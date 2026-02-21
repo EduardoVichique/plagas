@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Nuevo reporte</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="plaga-card">
+    <form (ngSubmit)="enviar()">
+      <ion-item lines="none" class="ion-no-padding mb-2">
+        <ion-input [(ngModel)]="titulo" name="titulo" label="Título" labelPlacement="stacked" placeholder="Ej: Plaga en cultivo de maíz" required></ion-input>
+      </ion-item>
+      <ion-item lines="none" class="ion-no-padding mb-2">
+        <ion-textarea [(ngModel)]="descripcion" name="descripcion" label="Descripción" labelPlacement="stacked" placeholder="Detalles del avistamiento" rows="3"></ion-textarea>
+      </ion-item>
+      <ion-item lines="none" class="ion-no-padding mb-2">
+        <ion-input [(ngModel)]="tipo_plaga" name="tipo_plaga" label="Tipo de plaga" labelPlacement="stacked" placeholder="Ej: Pulgón, Mildiu..."></ion-input>
+      </ion-item>
+      <div class="mb-2">
+        <label class="form-label">Foto (opcional)</label>
+        <input type="file" accept="image/*" (change)="onFileChange($event)" class="form-control" />
+        <img *ngIf="imagenPreview" [src]="imagenPreview" alt="Vista previa" style="max-width: 200px; max-height: 150px; margin-top: 8px; border-radius: 8px;" />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Ubicación GPS</label>
+        <ion-button expand="block" fill="outline" size="small" (click)="obtenerUbicacion()" [disabled]="gpsLoading">
+          {{ gpsLoading ? 'Obteniendo...' : (latitud ? 'Ubicación guardada' : 'Obtener mi ubicación') }}
+        </ion-button>
+        <p *ngIf="latitud != null" class="small text-muted mb-0 mt-1">{{ latitud }}, {{ longitud }}</p>
+      </div>
+      <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
+      <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
+        {{ loading ? 'Enviando...' : 'Crear reporte' }}
+      </ion-button>
+    </form>
+  </div>
+</ion-content>

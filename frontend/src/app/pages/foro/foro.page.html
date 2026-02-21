@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Foro</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="plaga-card mb-3">
+    <h3 class="h6 mb-2">Nuevo tema</h3>
+    <ion-item lines="none" class="ion-no-padding mb-2">
+      <ion-input [(ngModel)]="titulo" label="Título" labelPlacement="stacked" placeholder="Asunto del tema"></ion-input>
+    </ion-item>
+    <ion-item lines="none" class="ion-no-padding mb-2">
+      <ion-textarea [(ngModel)]="contenido" label="Contenido" labelPlacement="stacked" placeholder="Escribe tu pregunta o comentario" rows="3"></ion-textarea>
+    </ion-item>
+    <ion-item lines="none" class="ion-no-padding mb-2">
+      <ion-input [(ngModel)]="categoria" label="Categoría" labelPlacement="stacked" placeholder="Opcional"></ion-input>
+    </ion-item>
+    <ion-button expand="block" (click)="crearTema()" [disabled]="creando || !titulo.trim() || !contenido.trim()" class="btn-plaga">
+      {{ creando ? 'Publicando...' : 'Publicar tema' }}
+    </ion-button>
+  </div>
+  <h3 class="h6 mb-2">Temas ({{ total }})</h3>
+  <div *ngIf="loading" class="text-center py-3">
+    <ion-spinner></ion-spinner>
+  </div>
+  <ng-container *ngIf="!loading">
+  <div class="plaga-card mb-2" *ngFor="let t of temas" (click)="verTema(t.id)" style="cursor: pointer;">
+    <h4 class="h6 mb-1">{{ t.titulo }}</h4>
+    <p class="small text-muted mb-2">{{ t.Usuario?.nombre }} · {{ t.created_at | date:'short' }}</p>
+    <div class="d-flex align-items-center justify-content-between">
+      <span class="badge bg-secondary">{{ t.num_respuestas ?? 0 }} respuestas</span>
+      <ion-button fill="clear" size="small" (click)="ayuda(t, $event)">
+        <ion-icon name="thumbs-up-outline"></ion-icon>
+        {{ t.ayudas_count ?? 0 }}
+      </ion-button>
+    </div>
+  </div>
+  <p *ngIf="temas.length === 0" class="text-muted text-center py-4">No hay temas. Crea el primero arriba.</p>
+  </ng-container>
+</ion-content>

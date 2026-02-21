@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Guías de plagas</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <p class="text-muted small mb-3">Información técnica para identificación y control de plagas.</p>
+  <div *ngIf="loading" class="text-center py-5">
+    <ion-spinner></ion-spinner>
+  </div>
+  <div *ngIf="!loading">
+    <div class="plaga-card mb-2" *ngFor="let g of guias" (click)="ver(g.id)" style="cursor: pointer;">
+      <h4 class="h6 mb-1">{{ g.titulo }}</h4>
+      <p class="small text-muted mb-1">{{ g.tipo_plaga || 'General' }}</p>
+      <p class="small mb-0">{{ g.descripcion || 'Sin descripción' }}</p>
+      <ion-icon name="chevron-forward" class="float-end"></ion-icon>
+    </div>
+    <p *ngIf="guias.length === 0" class="text-muted text-center py-4">No hay guías disponibles.</p>
+  </div>
+</ion-content>

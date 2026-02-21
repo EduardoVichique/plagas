@@ -1,0 +1,20 @@
+diff --git a/node_modules/@stencil/core/internal/client/index.js b/node_modules/@stencil/core/internal/client/index.js
+index 0b51fa5..b26459b 100644
+--- a/node_modules/@stencil/core/internal/client/index.js
++++ b/node_modules/@stencil/core/internal/client/index.js
+@@ -158,13 +158,8 @@ var loadModule = (cmpMeta, hostRef, hmrVersionId) => {
+     return module[exportName];
+   }
+   /*!__STENCIL_STATIC_IMPORT_SWITCH__*/
+-  return import(
+-    /* @vite-ignore */
+-    /* webpackInclude: /\.entry\.js$/ */
+-    /* webpackExclude: /\.system\.entry\.js$/ */
+-    /* webpackMode: "lazy" */
+-    `./${bundleId}.entry.js${BUILD5.hotModuleReplacement && hmrVersionId ? "?s-hmr=" + hmrVersionId : ""}`
+-  ).then(
++  const stencilEntryPath = `./${bundleId}.entry.js${BUILD5.hotModuleReplacement && hmrVersionId ? "?s-hmr=" + hmrVersionId : ""}`;
++  return import(/* @vite-ignore */ stencilEntryPath).then(
+     (importedModule) => {
+       if (!BUILD5.hotModuleReplacement) {
+         cmpModules.set(bundleId, importedModule);

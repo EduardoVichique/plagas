@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/guias"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Guía</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div *ngIf="loading" class="text-center py-5">
+    <ion-spinner></ion-spinner>
+  </div>
+  <div *ngIf="!loading && guia" class="plaga-card">
+    <img *ngIf="guia.imagen_url" [src]="guia.imagen_url" alt="" class="img-fluid rounded mb-2" style="max-height: 200px; object-fit: cover; width: 100%;" />
+    <h2 class="h5 mb-1">{{ guia.titulo }}</h2>
+    <p class="badge bg-secondary mb-2">{{ guia.tipo_plaga || 'General' }}</p>
+    <p class="mb-2">{{ guia.descripcion }}</p>
+    <h3 class="h6 mb-1">Información técnica</h3>
+    <p class="mb-0" style="white-space: pre-wrap;">{{ guia.informacion_tecnica || 'No disponible' }}</p>
+  </div>
+</ion-content>
