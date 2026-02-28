@@ -37,6 +37,23 @@ module.exports = (sequelize, DataTypes) => {
       avatar_url: {
         type: DataTypes.STRING(500),
       },
+      rol: {
+        type: DataTypes.STRING(50),
+        defaultValue: 'usuario',
+      },
+      mfa_secret: {
+        type: DataTypes.STRING(500),
+      },
+      mfa_code: {
+        type: DataTypes.STRING(10),
+      },
+      mfa_expires_at: {
+        type: DataTypes.DATE,
+      },
+      mfa_attempts: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       activo: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

@@ -12,6 +12,8 @@ export class LoginPage {
   form: FormGroup;
   error = '';
   loading = false;
+  requireMfa = false;
+  mfaCode = '';
 
   constructor(
     private fb: FormBuilder,
@@ -29,10 +31,32 @@ export class LoginPage {
     if (this.form.invalid) return;
     this.loading = true;
     this.auth.login(this.form.value.email, this.form.value.password).subscribe({
-      next: () => this.router.navigate(['/tabs/home']),
+      next: (res) => {
+        if (res.data?.require_mfa) {
+          this.requireMfa = true;
+        } else {
+          this.router.navigate(['/tabs/home']);
+        }
+      },
       error: (err) => {
         this.loading = false;
-        this.error = err.error?.error || 'Error al iniciar sesión';
+        this.error = err.error?.message || err.error?.error || 'Error al iniciar sesión';
+      },
+      complete: () => (this.loading = false),
+    });
+  }
+
+  verifyMfa(): void {
+    if (!this.mfaCode || this.mfaCode.length !== 6) return;
+    this.error = '';
+    this.loading = true;
+    this.auth.verifyMfa(this.form.value.email, this.mfaCode).subscribe({
+      next: (res) => {
+        this.router.navigate(['/tabs/home']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err.error?.message || err.error?.error || 'Código incorrecto o expirado';
       },
       complete: () => (this.loading = false),
     });

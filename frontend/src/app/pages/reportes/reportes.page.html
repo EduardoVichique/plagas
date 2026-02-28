@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Reportes</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="nuevo()">
+      <ion-button routerLink="/reporte-nuevo">
         <ion-icon name="add"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -14,9 +14,10 @@
   </div>
   <div *ngIf="!loading">
     <p class="text-muted small mb-3">Total: {{ total }} reportes</p>
-    <div class="plaga-card mb-2" *ngFor="let r of reportes" (click)="ver(r.id)" style="cursor: pointer;">
+    <div class="plaga-card mb-2" *ngFor="let r of reportes" [routerLink]="['/reporte', r.id]" style="cursor: pointer;">
       <div class="d-flex align-items-start">
-        <img *ngIf="r.imagen_url" [src]="r.imagen_url" alt="" style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 12px;" />
+        <img *ngIf="r.imagen_url" [src]="r.imagen_url" alt=""
+          style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 12px;" />
         <div class="flex-grow-1">
           <h4 class="h6 mb-1">{{ r.titulo }}</h4>
           <p class="small text-muted mb-1">{{ r.estado }} · {{ r.tipo_plaga || 'Sin tipo' }}</p>
@@ -25,6 +26,7 @@
         <ion-icon name="chevron-forward"></ion-icon>
       </div>
     </div>
-    <p *ngIf="reportes.length === 0" class="text-muted text-center py-4">No hay reportes. Crea uno desde Inicio o el botón +.</p>
+    <p *ngIf="reportes.length === 0" class="text-muted text-center py-4">No hay reportes. Crea uno desde Inicio o el
+      botón +.</p>
   </div>
 </ion-content>

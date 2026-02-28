@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile
     container_name: plagacontrol-backend
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       PORT: 3000
       API_URL: http://localhost
       DB_HOST: postgres
@@ -55,7 +55,7 @@ services:
       dockerfile: Dockerfile
     container_name: plagacontrol-frontend
     ports:
-      - "80:80"
+      - "8081:80"
     depends_on:
       - backend
     networks:

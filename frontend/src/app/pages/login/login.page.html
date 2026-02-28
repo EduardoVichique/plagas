@@ -6,7 +6,7 @@
         <h1 class="h3 mt-2 mb-0">PlagaControl</h1>
         <p class="text-muted small">Control y reporte de plagas agrícolas</p>
       </div>
-      <form [formGroup]="form" (ngSubmit)="submit()">
+      <form *ngIf="!requireMfa" [formGroup]="form" (ngSubmit)="submit()">
         <ion-item lines="none" class="ion-no-padding mb-3">
           <ion-input formControlName="email" type="email" label="Email" labelPlacement="stacked" placeholder="tu@email.com"></ion-input>
         </ion-item>
@@ -15,12 +15,27 @@
         </ion-item>
         <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
         <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
-          {{ loading ? 'Entrando...' : 'Iniciar sesión' }}
+          {{ loading ? 'Ingresando...' : 'Entrar' }}
         </ion-button>
+        <p class="text-center mt-3 mb-0">
+          <a (click)="goRegistro()" class="text-primary" style="cursor: pointer;">¿No tienes cuenta? Regístrate</a>
+        </p>
       </form>
-      <p class="text-center mt-3 mb-0">
-        <a (click)="goRegistro()" class="text-primary" style="cursor: pointer;">¿No tienes cuenta? Regístrate</a>
-      </p>
+
+      <div *ngIf="requireMfa" class="text-center">
+        <h3 class="h5 mb-3">Verificación de 2 Pasos</h3>
+        <p class="small text-muted mb-4">Ingresa el código MFA enviado a tu correo.</p>
+        <ion-item lines="none" class="ion-no-padding mb-3 border rounded px-2">
+          <ion-input [(ngModel)]="mfaCode" type="text" placeholder="123456" maxlength="6" class="text-center fs-4 font-monospace py-2"></ion-input>
+        </ion-item>
+        <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
+        <ion-button expand="block" (click)="verifyMfa()" [disabled]="loading || !mfaCode || mfaCode.length !== 6" class="btn-plaga">
+          {{ loading ? 'Verificando...' : 'Confirmar Código' }}
+        </ion-button>
+        <p class="mt-3 mb-0">
+          <a (click)="requireMfa = false; error = ''; mfaCode = ''" class="text-muted small" style="cursor:pointer">&larr; Volver</a>
+        </p>
+      </div>
     </div>
   </div>
 </ion-content>

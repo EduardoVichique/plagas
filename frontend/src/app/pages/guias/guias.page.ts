@@ -12,7 +12,7 @@ export class GuiasPage {
   total = 0;
   loading = true;
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router) { }
 
   ionViewDidEnter(): void {
     this.cargar();
@@ -28,9 +28,5 @@ export class GuiasPage {
       error: () => (this.guias = []),
       complete: () => (this.loading = false),
     });
-  }
-
-  ver(id: number): void {
-    this.router.navigate(['/guia', id]);
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface User {
@@ -22,7 +22,7 @@ export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(this.getStoredUser());
   user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   get token(): string | null {
     return localStorage.getItem(TOKEN_KEY);
@@ -47,15 +47,33 @@ export class AuthService {
     this.userSubject.next(user);
   }
 
-  registro(data: { email: string; password: string; nombre: string; apellido?: string; experiencia?: string; tipo_cultivo?: string }): Observable<{ token: string; user: User }> {
-    return this.http.post<{ token: string; user: User }>(`${this.api}/registro`, data).pipe(
-      tap((res) => this.storeAuth(res.token, res.user))
+  registro(data: { email: string; password: string; nombre: string; apellido?: string; experiencia?: string; tipo_cultivo?: string }): Observable<any> {
+    return this.http.post<any>(`${this.api}/registro`, data).pipe(
+      tap((res) => {
+        if (res.data?.token) {
+          this.storeAuth(res.data.token, res.data.user);
+        }
+      })
     );
   }
 
-  login(email: string, password: string): Observable<{ token: string; user: User }> {
-    return this.http.post<{ token: string; user: User }>(`${this.api}/login`, { email, password }).pipe(
-      tap((res) => this.storeAuth(res.token, res.user))
+  login(email: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.api}/login`, { email, password }).pipe(
+      tap((res) => {
+        if (res.data?.token) {
+          this.storeAuth(res.data.token, res.data.user);
+        }
+      })
+    );
+  }
+
+  verifyMfa(email: string, code: string): Observable<any> {
+    return this.http.post<any>(`${this.api}/verify-mfa`, { email, code }).pipe(
+      tap((res) => {
+        if (res.data?.token) {
+          this.storeAuth(res.data.token, res.data.user);
+        }
+      })
     );
   }
 
@@ -66,7 +84,8 @@ export class AuthService {
   }
 
   refreshMe(): Observable<User> {
-    return this.http.get<User>(`${this.api}/me`).pipe(
+    return this.http.get<any>(`${this.api}/me`).pipe(
+      map((res) => res.data),
       tap((user) => {
         localStorage.setItem(USER_KEY, JSON.stringify(user));
         this.userSubject.next(user);

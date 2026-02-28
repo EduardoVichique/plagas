@@ -18,6 +18,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
     experiencia VARCHAR(50) DEFAULT 'Principiante',
     tipo_cultivo VARCHAR(100),
     avatar_url VARCHAR(500),
+    rol VARCHAR(50) DEFAULT 'usuario',
+    mfa_secret VARCHAR(500),
+    mfa_code VARCHAR(10),
+    mfa_expires_at TIMESTAMP WITH TIME ZONE,
+    mfa_attempts INTEGER DEFAULT 0,
     activo BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -95,8 +100,8 @@ CREATE INDEX IF NOT EXISTS idx_respuestas_foro ON respuestas(foro_id);
 CREATE INDEX IF NOT EXISTS idx_guias_tipo ON guias(tipo_plaga);
 
 -- Usuario por defecto para iniciar sesión (contraseña: 123456)
-INSERT INTO usuarios (email, password_hash, nombre, apellido, experiencia, tipo_cultivo) VALUES
-('admin@plagacontrol.com', crypt('123456', gen_salt('bf', 10)), 'Admin', 'PlagaControl', 'Avanzado', 'Varios')
+INSERT INTO usuarios (email, password_hash, nombre, apellido, experiencia, tipo_cultivo, rol) VALUES
+('admin@plagacontrol.com', crypt('123456', gen_salt('bf', 10)), 'Admin', 'PlagaControl', 'Avanzado', 'Varios', 'admin')
 ON CONFLICT (email) DO NOTHING;
 
 -- Datos iniciales: guías de ejemplo
