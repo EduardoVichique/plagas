@@ -15,11 +15,11 @@ const routes: Routes = [
       { path: 'perfil', loadChildren: () => import('../perfil/perfil.module').then((m) => m.PerfilPageModule) },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
-  },
+  }
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class TabsPageRoutingModule {}
+export class TabsPageRoutingModule { }
