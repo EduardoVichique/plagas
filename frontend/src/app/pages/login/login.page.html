@@ -2,25 +2,48 @@
   <div class="d-flex flex-column min-vh-100 justify-content-center align-items-center py-5">
     <div class="plaga-card w-100" style="max-width: 400px;">
       <div class="text-center mb-4">
-        <ion-icon name="leaf" style="font-size: 48px; color: var(--ion-color-primary);"></ion-icon>
-        <h1 class="h3 mt-2 mb-0">PlagaControl</h1>
+        <img src="assets/icon/logo.png" alt="PlagaControl Logo" style="width: 80px; height: 80px; object-fit: contain;"
+          class="mb-2" />
+        <h1 class="h3 mb-0">PlagaControl</h1>
         <p class="text-muted small">Control y reporte de plagas agrícolas</p>
       </div>
-      <form [formGroup]="form" (ngSubmit)="submit()">
-        <ion-item lines="none" class="ion-no-padding mb-3">
-          <ion-input formControlName="email" type="email" label="Email" labelPlacement="stacked" placeholder="tu@email.com"></ion-input>
-        </ion-item>
-        <ion-item lines="none" class="ion-no-padding mb-3">
-          <ion-input formControlName="password" type="password" label="Contraseña" labelPlacement="stacked" placeholder="Mínimo 6 caracteres"></ion-input>
-        </ion-item>
-        <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
-        <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
-          {{ loading ? 'Entrando...' : 'Iniciar sesión' }}
-        </ion-button>
-      </form>
-      <p class="text-center mt-3 mb-0">
-        <a (click)="goRegistro()" class="text-primary" style="cursor: pointer;">¿No tienes cuenta? Regístrate</a>
-      </p>
+
+      <ng-container *ngIf="!mfaRequired">
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <ion-item lines="none" class="ion-no-padding mb-3">
+            <ion-input formControlName="email" type="email" label="Email" labelPlacement="stacked"
+              placeholder="tu@email.com"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="ion-no-padding mb-3">
+            <ion-input formControlName="password" type="password" label="Contraseña" labelPlacement="stacked"
+              placeholder="Mínimo 6 caracteres"></ion-input>
+          </ion-item>
+          <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
+          <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
+            {{ loading ? 'Entrando...' : 'Iniciar sesión' }}
+          </ion-button>
+        </form>
+        <p class="text-center mt-3 mb-0">
+          <a (click)="goRegistro()" class="text-primary" style="cursor: pointer;">¿No tienes cuenta? Regístrate</a>
+        </p>
+      </ng-container>
+
+      <ng-container *ngIf="mfaRequired">
+        <form [formGroup]="mfaForm" (ngSubmit)="submitMfa()">
+          <p class="text-center mb-3">Ingresa el código de 6 dígitos de tu aplicación autenticadora.</p>
+          <ion-item lines="none" class="ion-no-padding mb-3">
+            <ion-input formControlName="code" type="text" label="Código MFA" labelPlacement="stacked"
+              placeholder="123456" maxlength="6"></ion-input>
+          </ion-item>
+          <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
+          <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
+            {{ loading ? 'Verificando...' : 'Verificar' }}
+          </ion-button>
+          <ion-button expand="block" fill="clear" (click)="mfaRequired = false; error = ''" [disabled]="loading">
+            Cancelar
+          </ion-button>
+        </form>
+      </ng-container>
     </div>
   </div>
 </ion-content>

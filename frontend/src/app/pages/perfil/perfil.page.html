@@ -54,7 +54,8 @@
             <p class="small text-muted">{{ t.ayudas_count }} ayudas · {{ t.created_at | date:'short' }}</p>
           </ion-label>
         </ion-item>
-        <p *ngIf="!(perfil.actividad_reciente?.reportes?.length) && !(perfil.actividad_reciente?.temas?.length)" class="small text-muted mb-0 ps-2">Sin actividad reciente</p>
+        <p *ngIf="!(perfil.actividad_reciente?.reportes?.length) && !(perfil.actividad_reciente?.temas?.length)"
+          class="small text-muted mb-0 ps-2">Sin actividad reciente</p>
       </ion-list>
     </div>
     <div class="plaga-card mb-3">
@@ -62,6 +63,44 @@
       <p class="small text-muted mb-0">Tipo de cultivo: {{ perfil.user?.tipo_cultivo || 'No especificado' }}</p>
       <p class="small text-muted mb-0">Experiencia: {{ perfil.user?.experiencia || 'Principiante' }}</p>
     </div>
+
+    <div class="plaga-card mb-4" *ngIf="perfil.user">
+      <h3 class="h6 mb-2">Seguridad (MFA)</h3>
+      <div *ngIf="!perfil.user.mfa_enabled && !mfaQR">
+        <p class="small text-muted mb-2">Autenticación de dos factores desactivada.</p>
+        <ion-button size="small" (click)="generarMfa()" fill="solid" color="primary">Activar MFA</ion-button>
+        <p *ngIf="mfaError" class="text-danger small mt-2">{{ mfaError }}</p>
+      </div>
+      <div *ngIf="mfaQR">
+        <p class="small mb-2"><strong>1.</strong> Escanea con tu app (Google Auth, Authy, etc.):</p>
+        <img [src]="mfaQR" alt="QR Code" class="img-fluid mb-2 border rounded" style="max-width: 200px;" />
+        <p class="small text-muted mb-2">Clave manual: <code>{{ mfaSecret }}</code></p>
+        <p class="small mb-2"><strong>2.</strong> Introduce el código generado:</p>
+        <ion-item lines="none" class="ion-no-padding mb-2 border rounded">
+          <ion-input [(ngModel)]="mfaCode" type="text" placeholder="123456" maxlength="6" class="px-2"></ion-input>
+        </ion-item>
+        <p *ngIf="mfaError" class="text-danger small mb-2">{{ mfaError }}</p>
+        <div class="d-flex justify-content-between">
+          <ion-button size="small" (click)="cancelarMfa()" fill="clear" color="medium">Cancelar</ion-button>
+          <ion-button size="small" (click)="verificarMfa()" fill="solid" color="success"
+            [disabled]="mfaCode.length !== 6">Verificar</ion-button>
+        </div>
+      </div>
+      <div *ngIf="perfil.user.mfa_enabled">
+        <p class="small text-success mb-0"><ion-icon name="checkmark-circle"></ion-icon> MFA está activado. Tu cuenta
+          está más segura.</p>
+      </div>
+    </div>
+
+    <div class="plaga-card mb-4" *ngIf="perfil.user?.rol === 'admin'">
+      <h3 class="h6 mb-2 text-danger">Administración</h3>
+      <p class="small text-muted mb-3">Herramientas exclusivas para administradores.</p>
+      <ion-button expand="block" (click)="irAuditorias()" fill="solid" color="dark" class="mb-2">
+        <ion-icon name="list-circle-outline" slot="start"></ion-icon>
+        Ver Registro de Auditorías
+      </ion-button>
+    </div>
+
     <ion-button expand="block" color="danger" fill="outline" (click)="logout()">
       <ion-icon name="log-out-outline" slot="start"></ion-icon>
       Cerrar sesión

@@ -1,6 +1,12 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>PlagaControl</ion-title>
+    <ion-title>
+      <div class="d-flex align-items-center">
+        <img src="assets/icon/logo.png" alt="Logo"
+          style="width: 28px; height: 28px; margin-right: 8px; object-fit: contain;">
+        PlagaControl
+      </div>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
@@ -38,6 +44,7 @@
         </ion-label>
       </ion-item>
     </ion-list>
-    <p *ngIf="!loading && !reportesRecientes.length" class="text-muted small mb-0">Aún no hay reportes. Crea el primero.</p>
+    <p *ngIf="!loading && !reportesRecientes.length" class="text-muted small mb-0">Aún no hay reportes. Crea el primero.
+    </p>
   </div>
 </ion-content>
