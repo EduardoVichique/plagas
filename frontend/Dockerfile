@@ -25,17 +25,17 @@ RUN test -f /app/www/browser/index.html || (echo "ERROR: Build no generó www/br
 # -----------------------------------------------------------------------------
 FROM nginx:alpine
 
-# Eliminar página por defecto de Nginx y config por defecto
-RUN rm -f /usr/share/nginx/html/index.html \
-          /usr/share/nginx/html/50x.html \
-          /etc/nginx/conf.d/default.conf
+# Limpiar directorio html por defecto de Nginx
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copiar SOLO el contenido de www/browser/ a la raíz de Nginx
-# (index.html y assets deben quedar en /usr/share/nginx/html/)
-COPY --from=build /app/www/browser /usr/share/nginx/html
+# Eliminar configuración por defecto de Nginx
+RUN rm -f /etc/nginx/conf.d/default.conf
 
-# Configuración Nginx para SPA + proxy API
+# Copiar configuración Nginx personalizada para SPA + proxy API
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copiar los archivos build del frontend a la raíz de Nginx
+COPY --from=build /app/www/browser /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
