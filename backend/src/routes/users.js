@@ -7,6 +7,10 @@ const { authMiddleware } = require('../middleware/auth');
 const { uploadAvatar } = require('../middleware/upload');
 
 const router = express.Router();
+const { requireRole } = require('../middleware/roleMiddleware');
+
+router.get('/admin', authMiddleware, requireRole(['admin']), usersController.getAllUsers);
+router.get('/admin/auditorias', authMiddleware, requireRole(['admin']), usersController.getAuditLogs);
 
 router.get('/perfil', authMiddleware, (req, res, next) => {
   req.params.id = req.userId;

@@ -74,3 +74,34 @@ exports.actualizarPerfil = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const usuarios = await db.Usuario.findAll({
+      attributes: { exclude: ['password_hash'] }
+    });
+    res.json({
+      success: true,
+      message: 'Usuarios obtenidos exitosamente',
+      data: usuarios
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getAuditLogs = async (req, res, next) => {
+  try {
+    const logs = await db.AuditLog.findAll({
+      order: [['created_at', 'DESC']],
+      limit: 100
+    });
+    res.json({
+      success: true,
+      message: 'Logs de auditoría obtenidos',
+      data: logs
+    });
+  } catch (err) {
+    next(err);
+  }
+};
