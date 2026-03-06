@@ -30,6 +30,7 @@ db.Comentario = require('./Comentario')(sequelize, Sequelize);
 db.Foro = require('./Foro')(sequelize, Sequelize);
 db.Respuesta = require('./Respuesta')(sequelize, Sequelize);
 db.Guia = require('./Guia')(sequelize, Sequelize);
+db.AuditLog = require('./AuditLog')(sequelize, Sequelize);
 
 // Asociaciones
 db.Usuario.hasMany(db.Reporte, { foreignKey: 'usuario_id' });

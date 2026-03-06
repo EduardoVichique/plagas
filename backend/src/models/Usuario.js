@@ -41,6 +41,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
       },
+      mfa_secret: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      mfa_enabled: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      rol: {
+        type: DataTypes.STRING(50),
+        defaultValue: 'user',
+      },
     },
     {
       tableName: 'usuarios',
