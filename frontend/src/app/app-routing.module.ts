@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
+import { RoleGuard } from './core/guards/role.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'tabs/home', pathMatch: 'full' },
@@ -31,6 +32,18 @@ const routes: Routes = [
     loadChildren: () => import('./pages/guia-detail/guia-detail.module').then((m) => m.GuiaDetailPageModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'admin/auditorias',
+    loadChildren: () => import('./pages/admin-auditorias/admin-auditorias.module').then((m) => m.AdminAuditoriasPageModule),
+    canActivate: [RoleGuard],
+    data: { roles: ['admin'] }
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./pages/tabs/tabs.module').then((m) => m.TabsPageModule),
+    canActivate: [RoleGuard],
+    data: { roles: ['admin'] }
+  },
   { path: '**', redirectTo: 'tabs/home' },
 ];
 
@@ -38,4 +51,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

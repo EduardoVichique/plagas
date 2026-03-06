@@ -1,4 +1,21 @@
 // Estilos globales - PlagaControl
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
 @import "theme/variables.scss";
 
 * {
@@ -20,47 +37,73 @@ ion-content {
 // Cards redondeadas estilo agrícola
 .plaga-card {
   border-radius: var(--plaga-card-radius);
-  box-shadow: var(--plaga-shadow);
+  box-shadow: 0 8px 24px rgba(27, 67, 50, 0.12);
   background: $plaga-card-bg;
-  padding: 1rem;
+  padding: 1.5rem;
   margin-bottom: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(27, 67, 50, 0.18);
+  }
 }
 
 // Barra inferior (tabs)
 ion-tab-bar {
   --background: #{$plaga-card-bg};
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   padding-bottom: env(safe-area-inset-bottom);
+  border: none;
 }
 
 ion-tab-button {
   --color: #{$plaga-text-muted};
   --color-selected: #{$plaga-primary};
+  transition: all 0.25s ease;
 }
 
-// Botones primarios
+// Botones primarios premium
 .btn-plaga {
-  background: $plaga-primary;
-  color: white;
-  border-radius: 12px;
-  font-weight: 600;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  &:hover {
-    background: $plaga-primary-dark;
-    color: white;
+  --background: transparent; // Disable default Ionic wrapper background
+  --color: #ffffff;
+
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &::part(native) {
+    background: linear-gradient(135deg, var(--plaga-primary) 0%, var(--plaga-primary-light) 100%);
+    color: #ffffff;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(64, 145, 108, 0.3);
+  }
+
+  &:hover::part(native) {
+    box-shadow: 0 6px 16px rgba(64, 145, 108, 0.4);
+    transform: translateY(-1px);
+    opacity: 0.95;
+  }
+
+  &:active::part(native) {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(64, 145, 108, 0.3);
   }
 }
 
 // Headers
 ion-header {
-  --background: #{$plaga-primary};
-  --color: white;
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2);
+
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: #ffffff;
+    color: #ffffff;
+  }
 }
 
-ion-toolbar {
-  --background: #{$plaga-primary};
-  --color: white;
+ion-title,
+.toolbar-title {
+  color: #ffffff !important;
 }
