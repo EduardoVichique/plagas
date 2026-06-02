@@ -20,3 +20,12 @@ ion-content {
   padding-bottom: 80px;
   /* Buffer para que el botón no quede bajo la barra de tabs */
 }
+
+.custom-white-text {
+  --color: #ffffff !important;
+  color: #ffffff !important;
+  
+  &::part(native) {
+    color: #ffffff !important;
+  }
+}

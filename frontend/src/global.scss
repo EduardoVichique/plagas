@@ -65,16 +65,16 @@ ion-tab-button {
   transition: all 0.25s ease;
 }
 
-// Botones primarios premium
+// Botones primarios premium (.btn-plaga original)
 .btn-plaga {
-  --background: transparent; // Disable default Ionic wrapper background
-  --color: #ffffff;
+  --background: solid; // Disable default Ionic wrapper background
+  --color: #000000; // Letra negra solicitada
 
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &::part(native) {
     background: linear-gradient(135deg, var(--plaga-primary) 0%, var(--plaga-primary-light) 100%);
-    color: #ffffff;
+    color: #000000; // Letra negra solicitada
     border-radius: 12px;
     font-weight: 600;
     box-shadow: 0 4px 12px rgba(64, 145, 108, 0.3);
@@ -91,6 +91,17 @@ ion-tab-button {
     box-shadow: 0 2px 8px rgba(64, 145, 108, 0.3);
   }
 }
+
+// Forzar letra e iconos negros en TODOS los botones de la app
+ion-button {
+  --color: #000000 !important;
+  color: #000000 !important;
+  
+  &::part(native) {
+    color: #000000 !important;
+  }
+}
+
 
 // Headers
 ion-header {

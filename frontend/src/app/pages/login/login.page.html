@@ -16,9 +16,8 @@
           </ion-item>
           <ion-item lines="none" class="ion-no-padding mb-3">
             <ion-input formControlName="password" type="password" label="Contraseña" labelPlacement="stacked"
-              placeholder="Mínimo 6 caracteres"></ion-input>
+              placeholder="Min. 8 caracteres, 1 mayús, nums y signos"></ion-input>
           </ion-item>
-          <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
           <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
             {{ loading ? 'Entrando...' : 'Iniciar sesión' }}
           </ion-button>
@@ -35,7 +34,6 @@
             <ion-input formControlName="code" type="text" label="Código MFA" labelPlacement="stacked"
               placeholder="123456" maxlength="6"></ion-input>
           </ion-item>
-          <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
           <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
             {{ loading ? 'Verificando...' : 'Verificar' }}
           </ion-button>

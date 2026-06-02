@@ -15,7 +15,11 @@ exports.registro = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: 'Datos inválidos', details: errors.array() });
+      return res.status(400).json({
+        success: false,
+        message: errors.array()[0].msg || 'Datos inválidos',
+        error: errors.array()
+      });
     }
     const { email, password, nombre, apellido, experiencia, tipo_cultivo } = req.body;
     const existente = await db.Usuario.findOne({ where: { email } });
@@ -60,7 +64,11 @@ exports.login = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: 'Datos inválidos', details: errors.array() });
+      return res.status(400).json({
+        success: false,
+        message: errors.array()[0].msg || 'Datos inválidos',
+        error: errors.array()
+      });
     }
     const { email, password } = req.body;
     const usuario = await db.Usuario.findOne({ where: { email } });

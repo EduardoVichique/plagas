@@ -13,13 +13,16 @@
         <ion-input formControlName="nombre" label="Nombre" labelPlacement="stacked" placeholder="Tu nombre"></ion-input>
       </ion-item>
       <ion-item lines="none" class="ion-no-padding mb-2">
-        <ion-input formControlName="apellido" label="Apellido" labelPlacement="stacked" placeholder="Opcional"></ion-input>
+        <ion-input formControlName="apellido" label="Apellido" labelPlacement="stacked"
+          placeholder="Opcional"></ion-input>
       </ion-item>
       <ion-item lines="none" class="ion-no-padding mb-2">
-        <ion-input formControlName="email" type="email" label="Email" labelPlacement="stacked" placeholder="tu@email.com"></ion-input>
+        <ion-input formControlName="email" type="email" label="Email" labelPlacement="stacked"
+          placeholder="tu@email.com"></ion-input>
       </ion-item>
       <ion-item lines="none" class="ion-no-padding mb-2">
-        <ion-input formControlName="password" type="password" label="Contraseña" labelPlacement="stacked" placeholder="Mínimo 6 caracteres"></ion-input>
+        <ion-input formControlName="password" type="password" label="Contraseña" labelPlacement="stacked"
+          placeholder="Min. 8 caracteres, 1 mayús, nums y signos"></ion-input>
       </ion-item>
       <ion-item lines="none" class="ion-no-padding mb-2">
         <ion-select formControlName="experiencia" label="Experiencia" labelPlacement="stacked" interface="popover">
@@ -30,9 +33,9 @@
         </ion-select>
       </ion-item>
       <ion-item lines="none" class="ion-no-padding mb-3">
-        <ion-input formControlName="tipo_cultivo" label="Tipo de cultivo" labelPlacement="stacked" placeholder="Ej: Maíz, Vid..."></ion-input>
+        <ion-input formControlName="tipo_cultivo" label="Tipo de cultivo" labelPlacement="stacked"
+          placeholder="Ej: Maíz, Vid..."></ion-input>
       </ion-item>
-      <p *ngIf="error" class="text-danger small mb-2">{{ error }}</p>
       <ion-button expand="block" type="submit" [disabled]="loading" class="btn-plaga">
         {{ loading ? 'Registrando...' : 'Crear cuenta' }}
       </ion-button>

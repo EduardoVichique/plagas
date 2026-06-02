@@ -12,9 +12,10 @@ const router = express.Router();
 router.post(
   '/registro',
   [
-    body('email').isEmail().normalizeEmail(),
-    body('password').isLength({ min: 6 }),
-    body('nombre').trim().notEmpty(),
+    body('email', 'Debe ser un correo electrónico válido').isEmail().normalizeEmail(),
+    body('password', 'La contraseña debe tener al menos 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial')
+      .isStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 }),
+    body('nombre', 'El nombre es requerido').trim().notEmpty(),
   ],
   logAudit('Registro de nuevo usuario', (req, res) => req.body.email),
   authController.registro
@@ -22,7 +23,10 @@ router.post(
 
 router.post(
   '/login',
-  [body('email').isEmail().normalizeEmail(), body('password').notEmpty()],
+  [
+    body('email', 'Debe ser un correo electrónico válido').isEmail().normalizeEmail(),
+    body('password', 'La contraseña es requerida').notEmpty()
+  ],
   logAudit('Inicio de sesión (Intento)', (req, res) => req.body.email),
   authController.login
 );
