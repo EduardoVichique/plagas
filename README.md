@@ -1,47 +1,75 @@
-# PlagaControl
+# PlagaControl 🌿
 
-Sistema móvil de control y reporte de plagas agrícolas. Aplicación completa con frontend Ionic + Angular, backend Node.js + Express, PostgreSQL y Docker.
+Sistema completo de control y reporte de plagas agrícolas.  
+Stack: **Ionic + Angular 17** · **Node.js + Express** · **PostgreSQL 15** · **Docker**
 
-## Estructura del proyecto
+---
+
+## 📁 Estructura del proyecto
 
 ```
 plagacontrol/
-├── backend/          # API REST Node.js + Express + Sequelize
-├── frontend/         # Ionic + Angular + Bootstrap 5
-├── database/         # Script SQL PostgreSQL
+├── backend/              # API REST Node.js + Express + Sequelize
+│   ├── src/
+│   │   ├── config/       # Configuración BD y mailer
+│   │   ├── controllers/  # Lógica de peticiones HTTP
+│   │   ├── middleware/   # Auth JWT, roles, validación, auditoría
+│   │   ├── models/       # Modelos Sequelize (ORM)
+│   │   ├── routes/       # Definición de endpoints
+│   │   └── utils/        # Logger Winston
+│   ├── migrations/       # Migraciones Sequelize
+│   ├── .env.example      # Variables de entorno de referencia
+│   └── Dockerfile
+├── frontend/             # Ionic + Angular 17 (NgModules)
+│   ├── src/
+│   ├── nginx.conf        # Configuración Nginx con proxy HTTPS
+│   ├── certs/            # Certificados SSL auto-firmados (incluidos)
+│   └── Dockerfile
+├── database/
+│   └── init.sql          # Script inicial de PostgreSQL
 ├── docker-compose.yml
 └── README.md
 ```
 
-## Requisitos
-
-- Node.js 18+
-- Docker y Docker Compose
-- (Opcional) Android Studio para compilar APK
-
 ---
 
-## Ejecutar con Docker (recomendado)
+## 🚀 Levantar con Docker (recomendado — un solo comando)
 
-Todo el sistema se levanta con un solo comando:
+### Requisitos previos
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y corriendo
+- Git
+
+### Pasos
 
 ```bash
+# 1. Clonar el repositorio
+git clone https://github.com/EduardoVichique/plagas.git
+cd plagas
+
+# 2. Levantar todos los servicios (PostgreSQL + Backend + Frontend)
 docker-compose up --build
 ```
 
-- **Frontend (web):** http://localhost  
-- **Backend API:** http://localhost:3000  
-- **PostgreSQL:** localhost:5432 (usuario: `plaga_user`, BD: `plagacontrol`)
+> La primera vez tarda ~3–5 minutos mientras descarga imágenes y construye el frontend Angular.
 
-La base de datos se inicializa automáticamente con el script `database/init.sql` (tablas y guías de ejemplo).
+### URLs disponibles
+
+| Servicio | URL |
+|----------|-----|
+| **Frontend (web)** | https://localhost *(acepta el certificado auto-firmado)* |
+| **Backend API** | http://localhost:3000 |
+| **PostgreSQL** | localhost:5432 |
+
+La base de datos se inicializa **automáticamente** con `database/init.sql` (tablas + datos de ejemplo).  
+Las migraciones Sequelize se ejecutan automáticamente al iniciar el contenedor del backend.
 
 ---
 
-## Desarrollo local (sin Docker)
+## 🛠️ Desarrollo local (sin Docker)
 
 ### 1. Base de datos PostgreSQL
 
-Crear base de datos y usuario (o usar los del script):
+Tener PostgreSQL 15 instalado localmente y ejecutar:
 
 ```bash
 psql -U postgres -f database/init.sql
@@ -53,20 +81,26 @@ O crear manualmente:
 CREATE USER plaga_user WITH PASSWORD 'plaga_pass_secure';
 CREATE DATABASE plagacontrol OWNER plaga_user;
 \c plagacontrol
--- luego ejecutar el contenido de database/init.sql
+-- ejecutar el contenido de database/init.sql
 ```
 
 ### 2. Backend
 
 ```bash
 cd backend
-cp .env.example .env
-# Editar .env con DB_HOST=localhost y las credenciales
+
+# Copiar variables de entorno y ajustar DB_HOST a localhost
+cp .env.example .env.development
+
+# Editar .env.development:
+# DB_HOST=localhost
+# JWT_SECRET=cambia-esto-por-algo-seguro
+
 npm install
-npm start
+npm run dev
 ```
 
-API en http://localhost:3000
+API disponible en: **http://localhost:3000**
 
 ### 3. Frontend
 
@@ -76,93 +110,127 @@ npm install
 npm start
 ```
 
-App en http://localhost:4200 (o el puerto que indique Angular).  
-Configurar `src/environments/environment.ts` con `apiUrl: 'http://localhost:3000/api'` si usas otro puerto.
+App disponible en: **http://localhost:4200**
+
+> Verificar que `src/environments/environment.ts` tenga `apiUrl: 'http://localhost:3000/api'`
 
 ---
 
-## API REST (resumen)
+## 🔐 Seguridad implementada
 
+| Característica | Implementación |
+|---|---|
+| Autenticación | JWT (7 días de expiración) |
+| Doble Factor (MFA) | TOTP con speakeasy + código QR |
+| Contraseñas | bcrypt con sal |
+| Validación de inputs | express-validator + sanitización |
+| Protección headers | Helmet.js |
+| Rate limiting | express-rate-limit (100 req/15min) |
+| Roles | admin / user con middleware de autorización |
+| Auditoría | Registro en BD + logs Winston |
+| HTTPS | Nginx con TLS 1.2/1.3 |
+
+---
+
+## 📡 API REST — Endpoints
+
+> Todos los endpoints protegidos requieren header: `Authorization: Bearer <token>`
+
+### Autenticación
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | POST | `/api/auth/registro` | Registro de usuario |
-| POST | `/api/auth/login` | Login (devuelve JWT) |
-| GET | `/api/auth/me` | Usuario actual (Bearer) |
-| GET | `/api/users/perfil` | Perfil y estadísticas (Bearer) |
-| PUT | `/api/users/perfil` | Actualizar perfil + avatar (Bearer) |
-| GET | `/api/reportes` | Listar reportes (Bearer) |
-| POST | `/api/reportes` | Crear reporte + imagen (Bearer) |
-| GET | `/api/reportes/:id` | Detalle reporte (Bearer) |
-| PUT | `/api/reportes/:id` | Actualizar reporte (Bearer) |
-| DELETE | `/api/reportes/:id` | Eliminar reporte (Bearer) |
-| POST | `/api/reportes/:id/comentarios` | Añadir comentario (Bearer) |
-| GET | `/api/foro/temas` | Listar temas (Bearer) |
-| POST | `/api/foro/temas` | Crear tema (Bearer) |
-| GET | `/api/foro/temas/:id` | Tema + respuestas (Bearer) |
-| POST | `/api/foro/temas/:id/ayuda` | +1 ayuda tema (Bearer) |
-| POST | `/api/foro/temas/:id/respuestas` | Crear respuesta (Bearer) |
-| POST | `/api/foro/respuestas/:id/ayuda` | +1 ayuda respuesta (Bearer) |
-| GET | `/api/guias` | Listar guías (Bearer) |
-| GET | `/api/guias/:id` | Detalle guía (Bearer) |
+| POST | `/api/auth/login` | Login (devuelve JWT o tempToken si MFA activo) |
+| GET | `/api/auth/me` | Perfil del usuario autenticado |
+| POST | `/api/auth/mfa/generate` | Generar secreto TOTP + QR code 🔒 |
+| POST | `/api/auth/mfa/verify` | Activar MFA con código TOTP 🔒 |
+| POST | `/api/auth/mfa/login` | Login con código MFA TOTP |
 
-Autenticación: header `Authorization: Bearer <token>`.
+### Usuarios
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/users/perfil` | Perfil + estadísticas 🔒 |
+| PUT | `/api/users/perfil` | Actualizar perfil + avatar 🔒 |
+| GET | `/api/users` | Listar usuarios 🔒👑 |
+| GET | `/api/users/:id` | Detalle de usuario 🔒👑 |
+
+### Reportes
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/reportes` | Listar reportes 🔒 |
+| POST | `/api/reportes` | Crear reporte + imagen 🔒 |
+| GET | `/api/reportes/:id` | Detalle de reporte 🔒 |
+| PUT | `/api/reportes/:id` | Actualizar reporte 🔒 |
+| DELETE | `/api/reportes/:id` | Eliminar reporte 🔒 |
+| POST | `/api/reportes/:id/comentarios` | Añadir comentario 🔒 |
+
+### Foro
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/foro/temas` | Listar temas 🔒 |
+| POST | `/api/foro/temas` | Crear tema 🔒 |
+| GET | `/api/foro/temas/:id` | Tema + respuestas 🔒 |
+| POST | `/api/foro/temas/:id/respuestas` | Responder tema 🔒 |
+| POST | `/api/foro/temas/:id/ayuda` | +1 útil a tema 🔒 |
+
+### Guías
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/guias` | Listar guías 🔒 |
+| GET | `/api/guias/:id` | Detalle de guía 🔒 |
+| POST | `/api/guias` | Crear guía 🔒👑 |
+| PUT | `/api/guias/:id` | Actualizar guía 🔒👑 |
+| DELETE | `/api/guias/:id` | Eliminar guía 🔒👑 |
+
+> 🔒 = requiere autenticación · 👑 = requiere rol `admin`
 
 ---
 
-## Compilar para Android (Capacitor)
-
-1. El frontend ya incluye dependencias de Capacitor. Desde la raíz del repo:
+## 📱 Compilar para Android (Capacitor)
 
 ```bash
 cd frontend
-```
-
-2. Build de producción:
-
-```bash
+npm install
 npm run build
-```
 
-3. Añadir plataforma Android y sincronizar:
-
-```bash
-npx cap add android
+npx cap add android      # Solo la primera vez
 npx cap sync android
+npx cap open android     # Abre Android Studio
 ```
 
-4. Abrir en Android Studio:
+Ejecutar desde Android Studio con dispositivo físico o emulador.
 
-```bash
-npx cap open android
-```
+---
 
-En Android Studio: abrir el proyecto `frontend/android`, conectar dispositivo o emulador y ejecutar (Run).
+## 🐳 Variables de entorno
 
-### Permisos en Android
+Copiar `.env.example` a `.env.development` o `.env.production` y ajustar:
 
-En `android/app/src/main/AndroidManifest.xml` deben estar (Capacitor suele añadirlos al usar los plugins):
-
-- `android.permission.CAMERA`
-- `android.permission.ACCESS_FINE_LOCATION` / `ACCESS_COARSE_LOCATION`
-- `android.permission.READ_EXTERNAL_STORAGE` / `WRITE_EXTERNAL_STORAGE` (según necesidad)
-
-Para desarrollo, configurar en `capacitor.config.ts` la URL del backend (por ejemplo tu IP local) si la app no usa el mismo host:
-
-```ts
-server: {
-  url: 'http://192.168.1.X:3000',
-  cleartext: true,
-},
+```env
+NODE_ENV=development
+PORT=3000
+DB_HOST=localhost          # postgres (en Docker) | localhost (local)
+DB_PORT=5432
+DB_NAME=plagacontrol
+DB_USER=plaga_user
+DB_PASSWORD=plaga_pass_secure
+JWT_SECRET=cambia-esto-en-produccion
+JWT_EXPIRES_IN=7d
+UPLOAD_PATH=./uploads
 ```
 
 ---
 
-## Tecnologías
+## 🧱 Tecnologías
 
-- **Frontend:** Ionic 7, Angular 17 (NgModules), Bootstrap 5, Ionic Icons, Leaflet (mapa), Capacitor (Android)
-- **Backend:** Node.js, Express, Sequelize (PostgreSQL), JWT, Multer (imágenes)
-- **Base de datos:** PostgreSQL 15
-- **Infraestructura:** Docker, Docker Compose, Nginx
+| Capa | Tecnología |
+|------|-----------|
+| Frontend | Ionic 7, Angular 17, Bootstrap 5, Leaflet, Capacitor |
+| Backend | Node.js 18, Express 4, Sequelize 6 |
+| Base de datos | PostgreSQL 15 |
+| Auth | JWT, bcrypt, speakeasy (TOTP/MFA) |
+| Infraestructura | Docker, Docker Compose, Nginx |
+| Logging | Winston |
 
 ---
 

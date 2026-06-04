@@ -3,9 +3,9 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Dependencias
+# Dependencias (incluye devDependencies para sequelize-cli en migraciones)
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 # Código fuente
 COPY . .
