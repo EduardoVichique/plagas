@@ -1,17 +1,24 @@
-/**
- * Middleware de registro de auditoría
- */
 const db = require('../models');
+const logger = require('../utils/logger');
 
+/**
+ * Middleware de registro de auditoría en Base de Datos para transacciones importantes.
+ */
 const logAudit = (accion, entidadFunc = null) => {
     return async (req, res, next) => {
-        // Intercept response finish
         res.on('finish', async () => {
-            // Solo loguear respuestas exitosas o específicas, o todas si se desea (aquí logueamos códigos 2xx o 3xx)
             if (res.statusCode >= 200 && res.statusCode < 400) {
                 try {
                     let entidadId = null;
-                    let entidad = entidadFunc ? entidadFunc(req, res) : null;
+                    let entidad = null;
+                    
+                    if (entidadFunc) {
+                        if (typeof entidadFunc === 'function') {
+                            entidad = entidadFunc(req, res);
+                        } else {
+                            entidad = entidadFunc;
+                        }
+                    }
 
                     if (req.params.id) entidadId = req.params.id;
                     if (res.locals.entidad_id) entidadId = res.locals.entidad_id;
@@ -28,7 +35,7 @@ const logAudit = (accion, entidadFunc = null) => {
                         ip: req.ip || req.connection.remoteAddress
                     });
                 } catch (error) {
-                    console.error('Error registrando auditoría:', error);
+                    logger.error('Error registrando auditoría en DB:', error);
                 }
             }
         });
@@ -36,4 +43,40 @@ const logAudit = (accion, entidadFunc = null) => {
     };
 };
 
-module.exports = { logAudit };
+/**
+ * Middleware para auditoría avanzada general de peticiones (Winston logger).
+ */
+const auditMiddleware = (req, res, next) => {
+    res.on('finish', () => {
+        const logData = {
+            accion: 'API Request',
+            method: req.method,
+            endpoint: req.originalUrl || req.url,
+            ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+            status: res.statusCode,
+            bodyPreview: Object.keys(req.body).length ? JSON.stringify(req.body).substring(0, 100) : null,
+        };
+
+        if (req.user && req.user.id) {
+            logData.userId = req.user.id;
+            logData.userEmail = req.user.email;
+        }
+
+        if (logData.bodyPreview && logData.bodyPreview.toLowerCase().includes('password')) {
+            logData.bodyPreview = 'HIDDEN_FOR_SECURITY';
+        }
+
+        if (res.statusCode >= 400) {
+            logger.warn(`Petición problemática`, logData);
+        } else {
+            logger.info(`Petición realizada`, logData);
+        }
+    });
+
+    next();
+};
+
+module.exports = {
+    logAudit,
+    auditMiddleware
+};

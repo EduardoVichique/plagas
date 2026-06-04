@@ -12,8 +12,28 @@ const foroRoutes = require('./routes/foro');
 const guiasRoutes = require('./routes/guias');
 const errorHandler = require('./middleware/errorHandler');
 const { UPLOAD_DIR } = require('./middleware/upload');
+const logger = require('./utils/logger');
+const auditMiddleware = require('./middleware/auditMiddleware');
+const helmet = require('helmet');
 
 const app = express();
+
+// Confiar en proxy si se despliega en Render o similar
+app.set('trust proxy', 1);
+
+// Redirección HTTP -> HTTPS en producción
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
+    return res.redirect(`https://${req.get('host')}${req.url}`);
+  }
+  next();
+});
+
+// Seguridad de headers de HTTP
+app.use(helmet());
+
+// Logging de auditoría
+app.use(auditMiddleware);
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());

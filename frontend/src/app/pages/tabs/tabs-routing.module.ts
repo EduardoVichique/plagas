@@ -33,7 +33,7 @@ const routes: Routes = [
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
-  },
+  }
 ];
 
 @NgModule({

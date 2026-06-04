@@ -16,7 +16,7 @@ export class ForoPage {
   contenido = '';
   categoria = '';
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router) { }
 
   ionViewDidEnter(): void {
     this.cargar();
@@ -48,10 +48,6 @@ export class ForoPage {
       },
       error: () => (this.creando = false),
     });
-  }
-
-  verTema(id: number): void {
-    this.router.navigate(['/tema', id]);
   }
 
   ayuda(tema: any, event: Event): void {

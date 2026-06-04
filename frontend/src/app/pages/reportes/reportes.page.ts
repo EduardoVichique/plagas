@@ -12,7 +12,7 @@ export class ReportesPage {
   total = 0;
   loading = true;
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router) { }
 
   ionViewDidEnter(): void {
     this.cargar();
@@ -28,13 +28,5 @@ export class ReportesPage {
       error: () => (this.reportes = []),
       complete: () => (this.loading = false),
     });
-  }
-
-  nuevo(): void {
-    this.router.navigate(['/reporte-nuevo']);
-  }
-
-  ver(id: number): void {
-    this.router.navigate(['/reporte', id]);
   }
 }

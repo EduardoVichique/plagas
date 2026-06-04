@@ -9,7 +9,7 @@
     <ion-spinner></ion-spinner>
   </div>
   <div *ngIf="!loading">
-    <div class="plaga-card mb-2" *ngFor="let g of guias" (click)="ver(g.id)" style="cursor: pointer;">
+    <div class="plaga-card mb-2" *ngFor="let g of guias" [routerLink]="['/guia', g.id]" style="cursor: pointer;">
       <h4 class="h6 mb-1">{{ g.titulo }}</h4>
       <p class="small text-muted mb-1">{{ g.tipo_plaga || 'General' }}</p>
       <p class="small mb-0">{{ g.descripcion || 'Sin descripción' }}</p>

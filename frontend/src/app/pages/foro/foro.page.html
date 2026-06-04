@@ -10,12 +10,14 @@
       <ion-input [(ngModel)]="titulo" label="Título" labelPlacement="stacked" placeholder="Asunto del tema"></ion-input>
     </ion-item>
     <ion-item lines="none" class="ion-no-padding mb-2">
-      <ion-textarea [(ngModel)]="contenido" label="Contenido" labelPlacement="stacked" placeholder="Escribe tu pregunta o comentario" rows="3"></ion-textarea>
+      <ion-textarea [(ngModel)]="contenido" label="Contenido" labelPlacement="stacked"
+        placeholder="Escribe tu pregunta o comentario" rows="3"></ion-textarea>
     </ion-item>
     <ion-item lines="none" class="ion-no-padding mb-2">
       <ion-input [(ngModel)]="categoria" label="Categoría" labelPlacement="stacked" placeholder="Opcional"></ion-input>
     </ion-item>
-    <ion-button expand="block" (click)="crearTema()" [disabled]="creando || !titulo.trim() || !contenido.trim()" class="btn-plaga">
+    <ion-button expand="block" (click)="crearTema()" [disabled]="creando || !titulo.trim() || !contenido.trim()"
+      class="btn-plaga">
       {{ creando ? 'Publicando...' : 'Publicar tema' }}
     </ion-button>
   </div>
@@ -24,17 +26,17 @@
     <ion-spinner></ion-spinner>
   </div>
   <ng-container *ngIf="!loading">
-  <div class="plaga-card mb-2" *ngFor="let t of temas" (click)="verTema(t.id)" style="cursor: pointer;">
-    <h4 class="h6 mb-1">{{ t.titulo }}</h4>
-    <p class="small text-muted mb-2">{{ t.Usuario?.nombre }} · {{ t.created_at | date:'short' }}</p>
-    <div class="d-flex align-items-center justify-content-between">
-      <span class="badge bg-secondary">{{ t.num_respuestas ?? 0 }} respuestas</span>
-      <ion-button fill="clear" size="small" (click)="ayuda(t, $event)">
-        <ion-icon name="thumbs-up-outline"></ion-icon>
-        {{ t.ayudas_count ?? 0 }}
-      </ion-button>
+    <div class="plaga-card mb-2" *ngFor="let t of temas" [routerLink]="['/tema', t.id]" style="cursor: pointer;">
+      <h4 class="h6 mb-1">{{ t.titulo }}</h4>
+      <p class="small text-muted mb-2">{{ t.Usuario?.nombre }} · {{ t.created_at | date:'short' }}</p>
+      <div class="d-flex align-items-center justify-content-between">
+        <span class="badge bg-secondary">{{ t.num_respuestas ?? 0 }} respuestas</span>
+        <ion-button fill="clear" size="small" (click)="ayuda(t, $event)">
+          <ion-icon name="thumbs-up-outline"></ion-icon>
+          {{ t.ayudas_count ?? 0 }}
+        </ion-button>
+      </div>
     </div>
-  </div>
-  <p *ngIf="temas.length === 0" class="text-muted text-center py-4">No hay temas. Crea el primero arriba.</p>
+    <p *ngIf="temas.length === 0" class="text-muted text-center py-4">No hay temas. Crea el primero arriba.</p>
   </ng-container>
 </ion-content>

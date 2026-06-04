@@ -38,7 +38,6 @@ export class LoginPage implements OnInit {
   }
 
   ngOnInit() {
-    // Si ya está autenticado, redirigir directamente sin pedir credenciales
     if (this.auth.isAuthenticated) {
       this.router.navigate(['/tabs/home']);
     }

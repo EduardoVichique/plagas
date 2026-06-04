@@ -17,7 +17,7 @@ export class HomePage {
     private auth: AuthService,
     private api: ApiService,
     private router: Router
-  ) {}
+  ) { }
 
   ionViewDidEnter(): void {
     this.loadReportes();
@@ -29,21 +29,5 @@ export class HomePage {
       error: () => (this.reportesRecientes = []),
       complete: () => (this.loading = false),
     });
-  }
-
-  goReporteNuevo(): void {
-    this.router.navigate(['/reporte-nuevo']);
-  }
-
-  goReporte(id: number): void {
-    this.router.navigate(['/reporte', id]);
-  }
-
-  goGuias(): void {
-    this.router.navigate(['/tabs/guias']);
-  }
-
-  goMapa(): void {
-    this.router.navigate(['/tabs/mapa']);
   }
 }

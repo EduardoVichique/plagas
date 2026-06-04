@@ -16,6 +16,15 @@ export interface User {
   rol?: string;
 }
 
+export interface RegistroData {
+  email: string;
+  password?: string;
+  nombre: string;
+  apellido?: string;
+  experiencia?: string;
+  tipo_cultivo?: string;
+}
+
 const TOKEN_KEY = 'plaga_token';
 const USER_KEY = 'plaga_user';
 
@@ -50,7 +59,7 @@ export class AuthService {
     this.userSubject.next(user);
   }
 
-  registro(data: any): Observable<{ token: string; user: User }> {
+  registro(data: RegistroData): Observable<{ token: string; user: User }> {
     return this.http.post<ApiResponse<{ token: string; user: User }>>(`${this.api}/registro`, data).pipe(
       map(res => res.data),
       tap((res) => this.storeAuth(res.token, res.user))
@@ -58,7 +67,7 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<{ token?: string; user?: User; mfaRequired?: boolean; tempToken?: string }> {
-    return this.http.post<ApiResponse<any>>(`${this.api}/login`, { email, password }).pipe(
+    return this.http.post<ApiResponse<{ token?: string; user?: User; mfaRequired?: boolean; tempToken?: string }>>(`${this.api}/login`, { email, password }).pipe(
       map(res => res.data),
       tap((res) => {
         if (!res.mfaRequired && res.token && res.user) {
@@ -69,7 +78,7 @@ export class AuthService {
   }
 
   loginMfa(tempToken: string, token: string): Observable<{ token: string; user: User }> {
-    return this.http.post<ApiResponse<any>>(`${this.api}/mfa/login`, { tempToken, token }).pipe(
+    return this.http.post<ApiResponse<{ token: string; user: User }>>(`${this.api}/mfa/login`, { tempToken, token }).pipe(
       map(res => res.data),
       tap((res) => {
         if (res.token && res.user) {

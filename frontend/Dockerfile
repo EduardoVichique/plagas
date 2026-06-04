@@ -16,9 +16,14 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Angular 17+ application builder escribe en www/browser/, no en www/
-# Verificamos que exista el artefacto antes de continuar
-RUN test -f /app/www/browser/index.html || (echo "ERROR: Build no generó www/browser/index.html" && exit 1)
+# El builder de Angular 17+ (application) puede escribir en www/browser/, mientras que el clásico (browser) escribe en www/
+# Si se detecta www/browser/index.html, movemos su contenido al directorio raíz www/
+RUN if [ -f /app/www/browser/index.html ]; then \
+      mv /app/www/browser/* /app/www/ && rm -rf /app/www/browser; \
+    fi
+
+# Verificamos que exista el archivo index.html antes de continuar
+RUN test -f /app/www/index.html || (echo "ERROR: Build no generó index.html" && exit 1)
 
 # -----------------------------------------------------------------------------
 # Etapa 2: Servir con Nginx (sin página por defecto)
@@ -35,7 +40,7 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copiar los archivos build del frontend a la raíz de Nginx
-COPY --from=build /app/www/browser /usr/share/nginx/html
+COPY --from=build /app/www /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

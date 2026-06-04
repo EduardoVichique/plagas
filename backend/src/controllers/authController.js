@@ -1,31 +1,29 @@
-/**
- * Controlador de autenticación - Registro y Login con JWT, además de MFA
- */
+const speakeasy = require('speakeasy');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { validationResult } = require('express-validator');
-const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 const db = require('../models');
 const { JWT_SECRET } = require('../middleware/auth');
+const logger = require('../utils/logger');
 
 const JWT_EXPIRES = process.env.JWT_EXPIRES_IN || '7d';
 
+/**
+ * Registro de un nuevo usuario.
+ */
 exports.registro = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: errors.array()[0].msg || 'Datos inválidos',
-        error: errors.array()
-      });
-    }
     const { email, password, nombre, apellido, experiencia, tipo_cultivo } = req.body;
+    
     const existente = await db.Usuario.findOne({ where: { email } });
     if (existente) {
-      return res.status(409).json({ error: 'El email ya está registrado' });
+      return res.status(409).json({ 
+        success: false, 
+        message: 'El email ya está registrado',
+        error: {} 
+      });
     }
+
     const password_hash = await bcrypt.hash(password, 10);
     const usuario = await db.Usuario.create({
       email,
@@ -36,10 +34,12 @@ exports.registro = async (req, res, next) => {
       tipo_cultivo: tipo_cultivo || null,
       rol: email === 'admin@plagacontrol.com' ? 'admin' : 'user',
     });
+
     const token = jwt.sign({ userId: usuario.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+    
     res.status(201).json({
       success: true,
-      message: 'Usuario registrado',
+      message: 'Usuario registrado exitosamente',
       data: {
         token,
         user: {
@@ -60,24 +60,29 @@ exports.registro = async (req, res, next) => {
   }
 };
 
+/**
+ * Inicio de sesión. Si tiene MFA habilitado, devuelve un token temporal.
+ */
 exports.login = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: errors.array()[0].msg || 'Datos inválidos',
-        error: errors.array()
-      });
-    }
     const { email, password } = req.body;
     const usuario = await db.Usuario.findOne({ where: { email } });
+
     if (!usuario || !usuario.activo) {
-      return res.status(401).json({ error: 'Credenciales incorrectas' });
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Credenciales incorrectas',
+        error: {} 
+      });
     }
+
     const ok = await bcrypt.compare(password, usuario.password_hash);
     if (!ok) {
-      return res.status(401).json({ error: 'Credenciales incorrectas' });
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Credenciales incorrectas',
+        error: {} 
+      });
     }
 
     if (usuario.mfa_enabled) {
@@ -90,6 +95,7 @@ exports.login = async (req, res, next) => {
     }
 
     const token = jwt.sign({ userId: usuario.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+    
     res.json({
       success: true,
       message: 'Login correcto',
@@ -113,12 +119,15 @@ exports.login = async (req, res, next) => {
   }
 };
 
+/**
+ * Obtener perfil de usuario autenticado.
+ */
 exports.me = async (req, res, next) => {
   try {
     const u = req.user;
     res.json({
       success: true,
-      message: 'Detalle de usuario',
+      message: 'Perfil recuperado',
       data: {
         id: u.id,
         email: u.email,
@@ -136,6 +145,9 @@ exports.me = async (req, res, next) => {
   }
 };
 
+/**
+ * Generar secreto TOTP y código QR para MFA.
+ */
 exports.generateMfa = async (req, res, next) => {
   try {
     const usuario = req.user;
@@ -148,7 +160,7 @@ exports.generateMfa = async (req, res, next) => {
       if (err) return next(err);
       res.json({
         success: true,
-        message: 'MFA se ha generado. Escanea el código QR.',
+        message: 'MFA generado exitosamente. Escanea el código QR.',
         data: {
           qrCodeImage: data_url,
           secret: secret.base32
@@ -160,6 +172,9 @@ exports.generateMfa = async (req, res, next) => {
   }
 };
 
+/**
+ * Verificar y activar MFA para el usuario autenticado.
+ */
 exports.verifyMfa = async (req, res, next) => {
   try {
     const { token } = req.body;
@@ -180,34 +195,57 @@ exports.verifyMfa = async (req, res, next) => {
         data: { mfa_enabled: true }
       });
     } else {
-      res.status(400).json({ error: 'Código inválido' });
+      res.status(400).json({ 
+        success: false, 
+        message: 'Código inválido',
+        error: {} 
+      });
     }
   } catch (err) {
     next(err);
   }
 };
 
+/**
+ * Iniciar sesión ingresando el token temporal y el código MFA TOTP.
+ */
 exports.loginMfa = async (req, res, next) => {
   try {
     const { tempToken, token } = req.body;
     if (!tempToken || !token) {
-      return res.status(400).json({ error: 'Tokens requeridos' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Tokens requeridos',
+        error: {} 
+      });
     }
 
     let decoded;
     try {
       decoded = jwt.verify(tempToken, JWT_SECRET);
     } catch (err) {
-      return res.status(401).json({ error: 'Token temporal no válido o caducado' });
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Token temporal no válido o caducado',
+        error: {} 
+      });
     }
 
     if (!decoded.isTemp) {
-      return res.status(401).json({ error: 'Token temporal no válido' });
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Token temporal no válido',
+        error: {} 
+      });
     }
 
     const usuario = await db.Usuario.findByPk(decoded.userId);
     if (!usuario) {
-      return res.status(401).json({ error: 'Usuario no encontrado' });
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Usuario no encontrado',
+        error: {} 
+      });
     }
 
     const verified = speakeasy.totp.verify({
@@ -217,7 +255,11 @@ exports.loginMfa = async (req, res, next) => {
     });
 
     if (!verified) {
-      return res.status(401).json({ error: 'Código MFA incorrecto' });
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Código MFA incorrecto',
+        error: {} 
+      });
     }
 
     const finalToken = jwt.sign({ userId: usuario.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES });

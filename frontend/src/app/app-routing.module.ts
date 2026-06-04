@@ -4,13 +4,17 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'tabs/home', pathMatch: 'full' },
   { path: 'login', loadChildren: () => import('./pages/login/login.module').then((m) => m.LoginPageModule) },
   { path: 'registro', loadChildren: () => import('./pages/registro/registro.module').then((m) => m.RegistroPageModule) },
   {
     path: 'tabs',
     loadChildren: () => import('./pages/tabs/tabs.module').then((m) => m.TabsPageModule),
     canActivate: [AuthGuard],
+  },
+  {
+    path: '',
+    redirectTo: '/tabs/home',
+    pathMatch: 'full'
   },
   {
     path: 'reporte-nuevo',
