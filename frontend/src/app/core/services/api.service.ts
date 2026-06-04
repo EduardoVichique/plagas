@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { ApiResponse } from '../../shared/interfaces/api-response.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -18,26 +20,38 @@ export class ApiService {
         }
       });
     }
-    return this.http.get<T>(`${this.base}${path}`, { params: httpParams });
+    return this.http.get<ApiResponse<T>>(`${this.base}${path}`, { params: httpParams }).pipe(
+      map(res => res.data)
+    );
   }
 
   post<T>(path: string, body: unknown): Observable<T> {
-    return this.http.post<T>(`${this.base}${path}`, body);
+    return this.http.post<ApiResponse<T>>(`${this.base}${path}`, body).pipe(
+      map(res => res.data)
+    );
   }
 
   postFormData<T>(path: string, formData: FormData): Observable<T> {
-    return this.http.post<T>(`${this.base}${path}`, formData);
+    return this.http.post<ApiResponse<T>>(`${this.base}${path}`, formData).pipe(
+      map(res => res.data)
+    );
   }
 
   put<T>(path: string, body: unknown): Observable<T> {
-    return this.http.put<T>(`${this.base}${path}`, body);
+    return this.http.put<ApiResponse<T>>(`${this.base}${path}`, body).pipe(
+      map(res => res.data)
+    );
   }
 
   putFormData<T>(path: string, formData: FormData): Observable<T> {
-    return this.http.put<T>(`${this.base}${path}`, formData);
+    return this.http.put<ApiResponse<T>>(`${this.base}${path}`, formData).pipe(
+      map(res => res.data)
+    );
   }
 
   delete<T>(path: string): Observable<T> {
-    return this.http.delete<T>(`${this.base}${path}`);
+    return this.http.delete<ApiResponse<T>>(`${this.base}${path}`).pipe(
+      map(res => res.data)
+    );
   }
 }
