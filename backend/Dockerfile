@@ -16,4 +16,4 @@ RUN mkdir -p uploads/reportes uploads/avatars
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["node", "src/server.js"]
+CMD ["sh", "-c", "npx sequelize-cli db:migrate && node src/server.js"]

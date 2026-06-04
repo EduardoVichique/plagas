@@ -39,10 +39,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       rol: {
         type: DataTypes.STRING(50),
-        defaultValue: 'usuario',
+        defaultValue: 'user',
       },
       mfa_secret: {
         type: DataTypes.STRING(500),
+      },
+      mfa_enabled: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
       mfa_code: {
         type: DataTypes.STRING(10),
@@ -57,18 +61,6 @@ module.exports = (sequelize, DataTypes) => {
       activo: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
-      },
-      mfa_secret: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-      },
-      mfa_enabled: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      rol: {
-        type: DataTypes.STRING(50),
-        defaultValue: 'user',
       },
     },
     {

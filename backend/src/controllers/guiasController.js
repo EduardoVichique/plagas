@@ -9,13 +9,22 @@ exports.listar = async (req, res, next) => {
     const where = {};
     if (tipo_plaga) where.tipo_plaga = tipo_plaga;
     if (activo !== undefined) where.activo = activo === 'true' || activo === true;
+
     const { count, rows } = await db.Guia.findAndCountAll({
       where,
       order: [['titulo', 'ASC']],
       limit: Math.min(parseInt(limit, 10) || 50, 100),
       offset: parseInt(offset, 10) || 0,
     });
-    res.json({ total: count, guias: rows });
+
+    res.json({
+      success: true,
+      message: 'Guías obtenidas exitosamente',
+      data: {
+        total: count,
+        guias: rows
+      }
+    });
   } catch (err) {
     next(err);
   }
@@ -24,8 +33,19 @@ exports.listar = async (req, res, next) => {
 exports.obtener = async (req, res, next) => {
   try {
     const guia = await db.Guia.findByPk(req.params.id);
-    if (!guia) return res.status(404).json({ error: 'Guía no encontrada' });
-    res.json(guia);
+    if (!guia) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Guía no encontrada',
+        error: {} 
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Guía obtenida exitosamente',
+      data: guia
+    });
   } catch (err) {
     next(err);
   }
@@ -41,7 +61,12 @@ exports.crear = async (req, res, next) => {
       informacion_tecnica: informacion_tecnica || null,
       imagen_url: imagen_url || null,
     });
-    res.status(201).json(guia);
+
+    res.status(201).json({
+      success: true,
+      message: 'Guía creada exitosamente',
+      data: guia
+    });
   } catch (err) {
     next(err);
   }
@@ -50,7 +75,14 @@ exports.crear = async (req, res, next) => {
 exports.actualizar = async (req, res, next) => {
   try {
     const guia = await db.Guia.findByPk(req.params.id);
-    if (!guia) return res.status(404).json({ error: 'Guía no encontrada' });
+    if (!guia) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Guía no encontrada',
+        error: {} 
+      });
+    }
+
     const { titulo, descripcion, tipo_plaga, informacion_tecnica, imagen_url, activo } = req.body;
     if (titulo !== undefined) guia.titulo = titulo;
     if (descripcion !== undefined) guia.descripcion = descripcion;
@@ -58,8 +90,14 @@ exports.actualizar = async (req, res, next) => {
     if (informacion_tecnica !== undefined) guia.informacion_tecnica = informacion_tecnica;
     if (imagen_url !== undefined) guia.imagen_url = imagen_url;
     if (activo !== undefined) guia.activo = activo;
+    
     await guia.save();
-    res.json(guia);
+
+    res.json({
+      success: true,
+      message: 'Guía actualizada exitosamente',
+      data: guia
+    });
   } catch (err) {
     next(err);
   }
@@ -68,9 +106,21 @@ exports.actualizar = async (req, res, next) => {
 exports.eliminar = async (req, res, next) => {
   try {
     const guia = await db.Guia.findByPk(req.params.id);
-    if (!guia) return res.status(404).json({ error: 'Guía no encontrada' });
+    if (!guia) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Guía no encontrada',
+        error: {} 
+      });
+    }
+
     await guia.destroy();
-    res.status(204).send();
+
+    res.json({
+      success: true,
+      message: 'Guía eliminada exitosamente',
+      data: {}
+    });
   } catch (err) {
     next(err);
   }

@@ -13,13 +13,40 @@ const guiasRoutes = require('./routes/guias');
 const errorHandler = require('./middleware/errorHandler');
 const { UPLOAD_DIR } = require('./middleware/upload');
 const logger = require('./utils/logger');
-const auditMiddleware = require('./middleware/auditMiddleware');
+const { auditMiddleware } = require('./middleware/auditMiddleware');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
 // Confiar en proxy si se despliega en Render o similar
 app.set('trust proxy', 1);
+
+// Limitador de peticiones generales
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 300,
+  message: {
+    success: false,
+    message: 'Demasiadas solicitudes desde esta IP, por favor intente de nuevo más tarde.',
+    error: {}
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Limitador para autenticación
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 15,
+  message: {
+    success: false,
+    message: 'Demasiados intentos de autenticación, intente de nuevo en 15 minutos.',
+    error: {}
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Redirección HTTP -> HTTPS en producción
 app.use((req, res, next) => {
@@ -31,6 +58,10 @@ app.use((req, res, next) => {
 
 // Seguridad de headers de HTTP
 app.use(helmet());
+
+// Aplicar limitadores
+app.use(generalLimiter);
+app.use('/api/auth', authLimiter);
 
 // Logging de auditoría
 app.use(auditMiddleware);

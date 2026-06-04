@@ -1,23 +1,36 @@
+const logger = require('../utils/logger');
+
 /**
- * Middleware global de manejo de errores
+ * Middleware global de manejo de errores.
+ * Asegura que todas las respuestas de error sigan el formato estándar.
  */
 const errorHandler = (err, req, res, next) => {
-  console.error('[Error]', err.message);
+  logger.error(`${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+
+  let statusCode = err.statusCode || 500;
+  let message = 'Error interno del servidor';
+  let errorDetail = {};
+
   if (err.name === 'SequelizeValidationError') {
-    return res.status(400).json({
-      error: 'Error de validación',
-      details: err.errors?.map((e) => ({ field: e.path, message: e.message })) || [],
-    });
+    statusCode = 400;
+    message = 'Error de validación de datos';
+    errorDetail = err.errors?.map((e) => ({ campo: e.path, mensaje: e.message })) || [];
+  } else if (err.name === 'SequelizeUniqueConstraintError') {
+    statusCode = 409;
+    message = 'El registro ya existe (campo duplicado)';
+  } else if (err.code === 'LIMIT_FILE_SIZE') {
+    statusCode = 400;
+    message = 'El archivo es demasiado grande (límite excedido)';
+  } else {
+    if (err.statusCode) {
+      message = err.message;
+    }
   }
-  if (err.name === 'SequelizeUniqueConstraintError') {
-    return res.status(409).json({ error: 'El registro ya existe (campo duplicado)' });
-  }
-  if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({ error: 'Archivo demasiado grande' });
-  }
-  const status = err.statusCode || 500;
-  res.status(status).json({
-    error: err.message || 'Error interno del servidor',
+
+  res.status(statusCode).json({
+    success: false,
+    message: message,
+    error: errorDetail
   });
 };
 
