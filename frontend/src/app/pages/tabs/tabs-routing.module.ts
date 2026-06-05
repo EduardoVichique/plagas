@@ -16,6 +16,10 @@ const routes: Routes = [
         children: [{ path: '', loadChildren: () => import('../reportes/reportes.module').then((m) => m.ReportesPageModule) }]
       },
       {
+        path: 'scanner',
+        children: [{ path: '', loadChildren: () => import('../scanner/scanner.module').then((m) => m.ScannerPageModule) }]
+      },
+      {
         path: 'mapa',
         children: [{ path: '', loadChildren: () => import('../mapa/mapa.module').then((m) => m.MapaPageModule) }]
       },

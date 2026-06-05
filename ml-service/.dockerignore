@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git
+.gitignore
+.env*
+.vscode/
+dataset/
+static/best_model.keras
+static/metrics.json
+static/training_curves.png
+static/confusion_matrix.png

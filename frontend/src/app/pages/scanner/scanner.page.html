@@ -1,0 +1,234 @@
+<ion-header>
+  <ion-toolbar>
+    <div class="d-flex align-items-center px-3">
+      <img src="assets/icon/logo.png" alt="Logo" style="width: 28px; height: 28px; margin-right: 8px; object-fit: contain;">
+      <ion-title style="padding: 0;">Escáner de Plagas</ion-title>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Selector de Pestañas (Segment) -->
+  <ion-segment [(ngModel)]="segment" (ionChange)="segmentChanged($event)" class="mb-3">
+    <ion-segment-button value="escanear">
+      <ion-label>Escanear</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="historial">
+      <ion-label>Historial</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="metricas">
+      <ion-label>Métricas IA</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- PESTAÑA: ESCANEAR -->
+  <div *ngIf="segment === 'escanear'">
+    <!-- Tarjeta de Entrada de Imagen -->
+    <div class="plaga-card text-center">
+      <h3 class="h5 mb-3">Detección Automática de Plagas</h3>
+      <p class="text-muted small mb-4">
+        Captura una fotografía o selecciona una imagen de la caña de azúcar para identificar plagas mediante modelos de Deep Learning.
+      </p>
+
+      <!-- Vista previa / Área de carga -->
+      <div class="upload-area mb-3 d-flex align-items-center justify-content-center border-dashed rounded-3" 
+           [class.has-image]="imagePreview"
+           style="min-height: 220px; border: 2px dashed var(--plaga-secondary); background: rgba(149, 213, 178, 0.08); position: relative; overflow: hidden;">
+        
+        <div *ngIf="!imagePreview" class="py-4">
+          <ion-icon name="camera-outline" style="font-size: 4rem; color: var(--plaga-primary-light);"></ion-icon>
+          <p class="small text-muted mt-2 mb-0">Presiona para cargar o capturar foto</p>
+        </div>
+
+        <img *ngIf="imagePreview" [src]="imagePreview" alt="Vista previa de caña" 
+             style="width: 100%; height: 220px; object-fit: cover;">
+        
+        <!-- Input de archivo oculto -->
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" 
+               style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="d-grid gap-2" *ngIf="imagePreview">
+        <ion-button expand="block" (click)="analizarImagen()" [disabled]="loadingPredict" class="btn-plaga">
+          <ion-icon name="analytics-outline" slot="start"></ion-icon>
+          {{ loadingPredict ? 'Analizando...' : 'Analizar Imagen' }}
+        </ion-button>
+        <ion-button fill="outline" color="medium" (click)="limpiarEscaner()" [disabled]="loadingPredict">
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
+          Quitar Imagen
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Resultados del Análisis -->
+    <div *ngIf="predictionResult" class="plaga-card prediction-result-card animate__animated animate__fadeIn">
+      <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+        <h4 class="h6 mb-0 text-success fw-bold">Resultado del Análisis</h4>
+        <span class="badge bg-success small py-1 px-2">{{ predictionResult.modelo }}</span>
+      </div>
+
+      <div class="row align-items-center">
+        <!-- Diagnóstico -->
+        <div class="col-12 mb-3">
+          <div class="d-flex align-items-baseline mb-1">
+            <span class="text-muted small me-2">Diagnóstico:</span>
+            <span class="h5 mb-0 fw-bold text-dark">{{ predictionResult.plaga }}</span>
+          </div>
+          
+          <!-- Barra de Confianza -->
+          <div class="mt-2">
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>Confianza:</span>
+              <span class="fw-bold">{{ predictionResult.confianza }}%</span>
+            </div>
+            <div class="progress" style="height: 10px; border-radius: 5px; background-color: var(--ion-color-light);">
+              <div class="progress-bar bg-success" role="progressbar" 
+                   [style.width.%]="predictionResult.confianza"
+                   [attr.aria-valuenow]="predictionResult.confianza" 
+                   aria-valuemin="0" aria-valuemax="100">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tiempos e Inferencia -->
+        <div class="col-12 mb-3">
+          <div class="d-flex justify-content-between small text-muted border-bottom py-1">
+            <span>Tiempo de inferencia:</span>
+            <span class="text-dark fw-semibold">{{ predictionResult.tiempo_inferencia }}</span>
+          </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div class="col-12">
+          <div class="recommendations-box p-3 rounded" style="background: rgba(45, 106, 79, 0.08); border-left: 4px solid var(--plaga-primary);">
+            <h5 class="small fw-bold text-success mb-1">Recomendación Técnica:</h5>
+            <p class="small mb-0 text-dark" style="line-height: 1.4;">
+              {{ predictionResult.recomendacion }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PESTAÑA: HISTORIAL -->
+  <div *ngIf="segment === 'historial'">
+    <div *ngIf="loadingHistory" class="text-center py-5">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p class="text-muted small mt-2">Cargando tu historial...</p>
+    </div>
+
+    <div *ngIf="!loadingHistory && !historyList.length" class="plaga-card text-center py-5">
+      <ion-icon name="folder-open-outline" style="font-size: 3.5rem; color: var(--ion-color-medium);"></ion-icon>
+      <h4 class="h6 mt-3 mb-1">Historial Vacío</h4>
+      <p class="text-muted small mb-0">Aún no has realizado escaneos de plagas.</p>
+    </div>
+
+    <div *ngIf="!loadingHistory && historyList.length">
+      <div class="plaga-card p-3 mb-2" *ngFor="let item of historyList">
+        <div class="d-flex align-items-center">
+          <img [src]="resolveImageUrl(item.imagen_url)" alt="Escaneo" 
+               class="rounded" style="width: 80px; height: 80px; object-fit: cover; margin-right: 1rem; border: 1px solid rgba(0,0,0,0.1);">
+          <div style="flex: 1; min-width: 0;">
+            <div class="d-flex justify-content-between align-items-start">
+              <h4 class="small fw-bold text-dark text-truncate mb-1" style="max-width: 85%;">{{ item.plaga_detectada }}</h4>
+              <span class="badge bg-success-light text-success small px-1.5 py-0.5" style="font-size: 0.75rem; background: rgba(45, 106, 79, 0.1);">
+                {{ item.confianza }}%
+              </span>
+            </div>
+            <p class="small text-muted mb-1" style="font-size: 0.8rem;">
+              Modelo: {{ item.modelo_usado }} · {{ item.tiempo_ejecucion }}
+            </p>
+            <p class="small text-muted mb-0" style="font-size: 0.75rem; font-style: italic;">
+              {{ item.created_at | date:'medium' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PESTAÑA: MÉTRICAS IA -->
+  <div *ngIf="segment === 'metricas'">
+    <div *ngIf="loadingMetrics" class="text-center py-5">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p class="text-muted small mt-2">Cargando métricas de entrenamiento...</p>
+    </div>
+
+    <div *ngIf="!loadingMetrics && metrics">
+      <!-- Tarjeta del Mejor Modelo Seleccionado -->
+      <div class="plaga-card" style="border: 1px solid var(--plaga-primary); background: linear-gradient(180deg, #ffffff 0%, rgba(149, 213, 178, 0.05) 100%);">
+        <h4 class="h6 text-success fw-bold mb-2">Modelo Seleccionado Automáticamente</h4>
+        <div class="d-flex align-items-baseline mb-2">
+          <span class="h4 text-dark fw-bold mb-0">{{ metrics.best_model }}</span>
+          <span class="small text-muted ms-2">(criterio: {{ metrics.selected_metric }})</span>
+        </div>
+        <p class="small text-muted mb-0">
+          Entrenado el {{ metrics.timestamp }} en un tiempo total de {{ metrics.total_training_time_seconds | number:'1.0-1' }} segundos sobre un dataset sintético equilibrado de caña de azúcar.
+        </p>
+      </div>
+
+      <!-- Tabla Comparativa de Rendimiento -->
+      <div class="plaga-card p-0 overflow-hidden mb-3">
+        <div class="px-3 py-2 border-bottom" style="background: rgba(45, 106, 79, 0.05);">
+          <h4 class="small fw-bold text-success mb-0">Comparativa Académica de Rendimiento</h4>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0 text-center" style="font-size: 0.82rem;">
+            <thead>
+              <tr style="background: rgba(0,0,0,0.02);">
+                <th class="text-start ps-3 fw-bold">Modelo</th>
+                <th class="fw-semibold">Accuracy</th>
+                <th class="fw-semibold">F1-Score</th>
+                <th class="fw-semibold">Precision</th>
+                <th class="fw-semibold">Recall</th>
+                <th class="fw-semibold">AUC-ROC</th>
+                <th class="fw-semibold">Log Loss</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let entry of metrics.metrics | keyvalue" [class.table-success]="entry.key === metrics.best_model">
+                <td class="text-start ps-3 fw-bold text-dark">
+                  {{ entry.key.replace('_', ' ') }}
+                  <span *ngIf="entry.key === metrics.best_model" class="text-success small ms-1">★</span>
+                </td>
+                <td>{{ entry.value.accuracy | number:'1.3-3' }}</td>
+                <td class="fw-bold">{{ entry.value.f1_score | number:'1.3-3' }}</td>
+                <td>{{ entry.value.precision | number:'1.3-3' }}</td>
+                <td>{{ entry.value.recall | number:'1.3-3' }}</td>
+                <td>{{ entry.value.auc_roc | number:'1.3-3' }}</td>
+                <td>{{ entry.value.log_loss | number:'1.3-3' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Gráficas de Entrenamiento -->
+      <div class="plaga-card">
+        <h4 class="h6 text-success fw-bold mb-3 border-bottom pb-2">Curvas de Aprendizaje</h4>
+        <p class="small text-muted mb-3">
+          Comportamiento de la Pérdida (Loss) y la Precisión (Accuracy) en los conjuntos de Entrenamiento y Validación a lo largo de las épocas.
+        </p>
+        <div class="text-center">
+          <img [src]="resolveImageUrl('/api/ml/static/training_curves.png')" alt="Curvas de Entrenamiento" 
+               class="img-fluid rounded border" style="max-height: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+        </div>
+      </div>
+
+      <!-- Matriz de Confusión -->
+      <div class="plaga-card">
+        <h4 class="h6 text-success fw-bold mb-3 border-bottom pb-2">Matriz de Confusión</h4>
+        <p class="small text-muted mb-3">
+          Evaluación detallada de errores del mejor modelo ({{ metrics.best_model }}). Muestra la correspondencia entre las clases reales de plagas y las predicciones efectuadas.
+        </p>
+        <div class="text-center">
+          <img [src]="resolveImageUrl('/api/ml/static/confusion_matrix.png')" alt="Matriz de Confusión" 
+               class="img-fluid rounded border" style="max-height: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

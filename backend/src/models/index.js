@@ -31,10 +31,14 @@ db.Foro = require('./Foro')(sequelize, Sequelize);
 db.Respuesta = require('./Respuesta')(sequelize, Sequelize);
 db.Guia = require('./Guia')(sequelize, Sequelize);
 db.AuditLog = require('./AuditLog')(sequelize, Sequelize);
+db.Prediccion = require('./Prediccion')(sequelize, Sequelize);
 
 // Asociaciones
 db.Usuario.hasMany(db.Reporte, { foreignKey: 'usuario_id' });
 db.Reporte.belongsTo(db.Usuario, { foreignKey: 'usuario_id' });
+
+db.Usuario.hasMany(db.Prediccion, { foreignKey: 'usuario_id' });
+db.Prediccion.belongsTo(db.Usuario, { foreignKey: 'usuario_id' });
 
 db.Reporte.hasMany(db.Comentario, { foreignKey: 'reporte_id' });
 db.Comentario.belongsTo(db.Reporte, { foreignKey: 'reporte_id' });

@@ -89,10 +89,24 @@ CREATE TABLE IF NOT EXISTS guias (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabla: predicciones (historial de escaneo de plagas con IA)
+CREATE TABLE IF NOT EXISTS predicciones (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+    imagen_url VARCHAR(500) NOT NULL,
+    plaga_detectada VARCHAR(100) NOT NULL,
+    confianza DECIMAL(5, 2) NOT NULL,
+    modelo_usado VARCHAR(100) NOT NULL,
+    tiempo_ejecucion VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Índices para mejorar consultas
 CREATE INDEX IF NOT EXISTS idx_reportes_usuario ON reportes(usuario_id);
 CREATE INDEX IF NOT EXISTS idx_reportes_estado ON reportes(estado);
 CREATE INDEX IF NOT EXISTS idx_reportes_created ON reportes(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_predicciones_usuario ON predicciones(usuario_id);
 CREATE INDEX IF NOT EXISTS idx_comentarios_reporte ON comentarios(reporte_id);
 CREATE INDEX IF NOT EXISTS idx_foro_usuario ON foro(usuario_id);
 CREATE INDEX IF NOT EXISTS idx_foro_categoria ON foro(categoria);
