@@ -8,102 +8,153 @@
     <ion-spinner></ion-spinner>
   </div>
   <div *ngIf="!loading && perfil" class="perfil-container">
-    <div class="plaga-card text-center mb-3">
-      <div class="avatar-wrap mb-2">
-        <img *ngIf="perfil.user?.avatar_url" [src]="perfil.user.avatar_url" alt="Avatar" class="avatar-img" />
-        <ion-icon *ngIf="!perfil.user?.avatar_url" name="person-circle" class="avatar-icon"></ion-icon>
+    
+    <!-- MODO VISTA -->
+    <ng-container *ngIf="!editMode">
+      <div class="plaga-card text-center mb-3">
+        <div class="avatar-wrap mb-2">
+          <img *ngIf="perfil.user?.avatar_url" [src]="perfil.user.avatar_url" alt="Avatar" class="avatar-img" />
+          <ion-icon *ngIf="!perfil.user?.avatar_url" name="person-circle" class="avatar-icon"></ion-icon>
+        </div>
+        <h2 class="h5 mb-1">{{ perfil.user?.nombre }} {{ perfil.user?.apellido || '' }}</h2>
+        <p class="text-muted small mb-0">{{ perfil.user?.email }}</p>
+        <p class="mt-2 mb-0">
+          <span class="badge bg-primary">{{ perfil.user?.experiencia || 'Principiante' }}</span>
+          <span *ngIf="perfil.user?.tipo_cultivo" class="badge bg-secondary ms-1">{{ perfil.user.tipo_cultivo }}</span>
+        </p>
+        <ion-button size="small" fill="clear" color="primary" class="mt-2" (click)="iniciarEdicion()">
+          <ion-icon name="create-outline" slot="start"></ion-icon>
+          Editar perfil
+        </ion-button>
       </div>
-      <h2 class="h5 mb-1">{{ perfil.user?.nombre }} {{ perfil.user?.apellido || '' }}</h2>
-      <p class="text-muted small mb-0">{{ perfil.user?.email }}</p>
-      <p class="mt-2 mb-0">
-        <span class="badge bg-primary">{{ perfil.user?.experiencia || 'Principiante' }}</span>
-        <span *ngIf="perfil.user?.tipo_cultivo" class="badge bg-secondary ms-1">{{ perfil.user.tipo_cultivo }}</span>
-      </p>
-    </div>
-    <div class="plaga-card mb-3">
-      <h3 class="h6 mb-2">Estadísticas</h3>
-      <div class="row text-center">
-        <div class="col-4">
-          <div class="h5 mb-0 text-primary">{{ perfil.stats?.reportes ?? 0 }}</div>
-          <small class="text-muted">Reportes</small>
-        </div>
-        <div class="col-4">
-          <div class="h5 mb-0 text-primary">{{ perfil.stats?.temas_foro ?? 0 }}</div>
-          <small class="text-muted">Temas</small>
-        </div>
-        <div class="col-4">
-          <div class="h5 mb-0 text-primary">{{ perfil.stats?.respuestas ?? 0 }}</div>
-          <small class="text-muted">Respuestas</small>
+      <div class="plaga-card mb-3">
+        <h3 class="h6 mb-2">Estadísticas</h3>
+        <div class="row text-center">
+          <div class="col-4">
+            <div class="h5 mb-0 text-primary">{{ perfil.stats?.reportes ?? 0 }}</div>
+            <small class="text-muted">Reportes</small>
+          </div>
+          <div class="col-4">
+            <div class="h5 mb-0 text-primary">{{ perfil.stats?.temas_foro ?? 0 }}</div>
+            <small class="text-muted">Temas</small>
+          </div>
+          <div class="col-4">
+            <div class="h5 mb-0 text-primary">{{ perfil.stats?.respuestas ?? 0 }}</div>
+            <small class="text-muted">Respuestas</small>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="plaga-card mb-3">
-      <h3 class="h6 mb-2">Actividad reciente</h3>
-      <ion-list lines="none">
-        <ion-item *ngFor="let r of perfil.actividad_reciente?.reportes" [routerLink]="['/reporte', r.id]" button>
-          <ion-icon name="document-text" slot="start"></ion-icon>
-          <ion-label>
-            <p>{{ r.titulo }}</p>
-            <p class="small text-muted">{{ r.estado }} · {{ r.created_at | date:'short' }}</p>
-          </ion-label>
-        </ion-item>
-        <ion-item *ngFor="let t of perfil.actividad_reciente?.temas" [routerLink]="['/tema', t.id]" button>
-          <ion-icon name="chatbubble" slot="start"></ion-icon>
-          <ion-label>
-            <p>{{ t.titulo }}</p>
-            <p class="small text-muted">{{ t.ayudas_count }} ayudas · {{ t.created_at | date:'short' }}</p>
-          </ion-label>
-        </ion-item>
-        <p *ngIf="!(perfil.actividad_reciente?.reportes?.length) && !(perfil.actividad_reciente?.temas?.length)"
-          class="small text-muted mb-0 ps-2">Sin actividad reciente</p>
-      </ion-list>
-    </div>
-    <div class="plaga-card mb-3">
-      <h3 class="h6 mb-2">Preferencias</h3>
-      <p class="small text-muted mb-0">Tipo de cultivo: {{ perfil.user?.tipo_cultivo || 'No especificado' }}</p>
-      <p class="small text-muted mb-0">Experiencia: {{ perfil.user?.experiencia || 'Principiante' }}</p>
-    </div>
+      <div class="plaga-card mb-3">
+        <h3 class="h6 mb-2">Actividad reciente</h3>
+        <ion-list lines="none">
+          <ion-item *ngFor="let r of perfil.actividad_reciente?.reportes" [routerLink]="['/reporte', r.id]" button>
+            <ion-icon name="document-text" slot="start"></ion-icon>
+            <ion-label>
+              <p>{{ r.titulo }}</p>
+              <p class="small text-muted">{{ r.estado }} · {{ r.created_at | date:'short' }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item *ngFor="let t of perfil.actividad_reciente?.temas" [routerLink]="['/tema', t.id]" button>
+            <ion-icon name="chatbubble" slot="start"></ion-icon>
+            <ion-label>
+              <p>{{ t.titulo }}</p>
+              <p class="small text-muted">{{ t.ayudas_count }} ayudas · {{ t.created_at | date:'short' }}</p>
+            </ion-label>
+          </ion-item>
+          <p *ngIf="!(perfil.actividad_reciente?.reportes?.length) && !(perfil.actividad_reciente?.temas?.length)"
+            class="small text-muted mb-0 ps-2">Sin actividad reciente</p>
+        </ion-list>
+      </div>
+      <div class="plaga-card mb-3">
+        <h3 class="h6 mb-2">Preferencias</h3>
+        <p class="small text-muted mb-0">Tipo de cultivo: {{ perfil.user?.tipo_cultivo || 'No especificado' }}</p>
+        <p class="small text-muted mb-0">Experiencia: {{ perfil.user?.experiencia || 'Principiante' }}</p>
+      </div>
 
-    <div class="plaga-card mb-4" *ngIf="perfil.user">
-      <h3 class="h6 mb-2">Seguridad (MFA)</h3>
-      <div *ngIf="!perfil.user.mfa_enabled && !mfaQR">
-        <p class="small text-muted mb-2">Autenticación de dos factores desactivada.</p>
-        <ion-button size="small" (click)="generarMfa()" fill="solid" color="primary">Activar MFA</ion-button>
-        <p *ngIf="mfaError" class="text-danger small mt-2">{{ mfaError }}</p>
-      </div>
-      <div *ngIf="mfaQR">
-        <p class="small mb-2"><strong>1.</strong> Escanea con tu app (Google Auth, Authy, etc.):</p>
-        <img [src]="mfaQR" alt="QR Code" class="img-fluid mb-2 border rounded" style="max-width: 200px;" />
-        <p class="small text-muted mb-2">Clave manual: <code>{{ mfaSecret }}</code></p>
-        <p class="small mb-2"><strong>2.</strong> Introduce el código generado:</p>
-        <ion-item lines="none" class="ion-no-padding mb-2 border rounded">
-          <ion-input [(ngModel)]="mfaCode" type="text" placeholder="123456" maxlength="6" class="px-2"></ion-input>
-        </ion-item>
-        <p *ngIf="mfaError" class="text-danger small mb-2">{{ mfaError }}</p>
-        <div class="d-flex justify-content-between">
-          <ion-button size="small" (click)="cancelarMfa()" fill="clear" color="medium">Cancelar</ion-button>
-          <ion-button size="small" (click)="verificarMfa()" fill="solid" color="success"
-            [disabled]="mfaCode.length !== 6">Verificar</ion-button>
+      <div class="plaga-card mb-4" *ngIf="perfil.user">
+        <h3 class="h6 mb-2">Seguridad (MFA)</h3>
+        <div *ngIf="!perfil.user.mfa_enabled && !mfaQR">
+          <p class="small text-muted mb-2">Autenticación de dos factores desactivada.</p>
+          <ion-button size="small" (click)="generarMfa()" fill="solid" color="primary">Activar MFA</ion-button>
+          <p *ngIf="mfaError" class="text-danger small mt-2">{{ mfaError }}</p>
+        </div>
+        <div *ngIf="mfaQR">
+          <p class="small mb-2"><strong>1.</strong> Escanea con tu app (Google Auth, Authy, etc.):</p>
+          <img [src]="mfaQR" alt="QR Code" class="img-fluid mb-2 border rounded" style="max-width: 200px;" />
+          <p class="small text-muted mb-2">Clave manual: <code>{{ mfaSecret }}</code></p>
+          <p class="small mb-2"><strong>2.</strong> Introduce el código generado:</p>
+          <ion-item lines="none" class="ion-no-padding mb-2 border rounded">
+            <ion-input [(ngModel)]="mfaCode" type="text" placeholder="123456" maxlength="6" class="px-2"></ion-input>
+          </ion-item>
+          <p *ngIf="mfaError" class="text-danger small mb-2">{{ mfaError }}</p>
+          <div class="d-flex justify-content-between">
+            <ion-button size="small" (click)="cancelarMfa()" fill="clear" color="medium">Cancelar</ion-button>
+            <ion-button size="small" (click)="verificarMfa()" fill="solid" color="success"
+              [disabled]="mfaCode.length !== 6">Verificar</ion-button>
+          </div>
+        </div>
+        <div *ngIf="perfil.user.mfa_enabled">
+          <p class="small text-success mb-0"><ion-icon name="checkmark-circle"></ion-icon> MFA está activado. Tu cuenta
+            está más segura.</p>
         </div>
       </div>
-      <div *ngIf="perfil.user.mfa_enabled">
-        <p class="small text-success mb-0"><ion-icon name="checkmark-circle"></ion-icon> MFA está activado. Tu cuenta
-          está más segura.</p>
-      </div>
-    </div>
 
-    <div class="plaga-card mb-4" *ngIf="perfil.user?.rol === 'admin'">
-      <h3 class="h6 mb-2 text-danger">Administración</h3>
-      <p class="small text-muted mb-3">Herramientas exclusivas para administradores.</p>
-      <ion-button expand="block" (click)="irAuditorias()" fill="solid" color="dark" class="mb-2 custom-white-text">
-        <ion-icon name="list-circle-outline" slot="start"></ion-icon>
-        Ver Registro de Auditorías
+      <div class="plaga-card mb-4" *ngIf="perfil.user?.rol === 'admin'">
+        <h3 class="h6 mb-2 text-danger">Administración</h3>
+        <p class="small text-muted mb-3">Herramientas exclusivas para administradores.</p>
+        <ion-button expand="block" (click)="irAuditorias()" fill="solid" color="dark" class="mb-2 custom-white-text">
+          <ion-icon name="list-circle-outline" slot="start"></ion-icon>
+          Ver Registro de Auditorías
+        </ion-button>
+      </div>
+
+      <ion-button expand="block" color="danger" fill="outline" (click)="logout()">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Cerrar sesión
       </ion-button>
-    </div>
+    </ng-container>
 
-    <ion-button expand="block" color="danger" fill="outline" (click)="logout()">
-      <ion-icon name="log-out-outline" slot="start"></ion-icon>
-      Cerrar sesión
-    </ion-button>
+    <!-- MODO EDICIÓN -->
+    <ng-container *ngIf="editMode">
+      <div class="plaga-card mb-3">
+        <h3 class="h6 mb-3">Editar Información Personal</h3>
+        
+        <div class="text-center mb-3">
+          <div class="avatar-wrap mb-2 mx-auto" style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #eee;">
+            <img *ngIf="avatarPreview" [src]="avatarPreview" alt="Vista previa avatar" style="width: 100%; height: 100%; object-fit: cover;" />
+            <ion-icon *ngIf="!avatarPreview" name="person-circle" style="font-size: 80px; color: #aaa;"></ion-icon>
+          </div>
+          <label class="form-label small text-muted d-block">Seleccionar nueva foto</label>
+          <input type="file" accept="image/*" (change)="onAvatarFileChange($event)" class="form-control form-control-sm" />
+        </div>
+
+        <ion-item lines="none" class="ion-no-padding mb-2">
+          <ion-input [(ngModel)]="nombreEdit" name="nombreEdit" label="Nombre" labelPlacement="stacked" placeholder="Tu nombre" required></ion-input>
+        </ion-item>
+        
+        <ion-item lines="none" class="ion-no-padding mb-2">
+          <ion-input [(ngModel)]="apellidoEdit" name="apellidoEdit" label="Apellido" labelPlacement="stacked" placeholder="Tu apellido"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="ion-no-padding mb-2">
+          <ion-input [(ngModel)]="experienciaEdit" name="experienciaEdit" label="Experiencia" labelPlacement="stacked" placeholder="Ej: 5 años, Principiante..."></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="ion-no-padding mb-3">
+          <ion-input [(ngModel)]="tipoCultivoEdit" name="tipoCultivoEdit" label="Tipo de cultivo principal" labelPlacement="stacked" placeholder="Ej: Caña de Azúcar, Maíz..."></ion-input>
+        </ion-item>
+
+        <p *ngIf="editError" class="text-danger small mb-2">{{ editError }}</p>
+        
+        <div class="d-flex justify-content-between mt-3">
+          <ion-button fill="clear" color="medium" (click)="editMode = false" [disabled]="editLoading">
+            Cancelar
+          </ion-button>
+          <ion-button color="success" (click)="confirmarCambios()" [disabled]="editLoading || !nombreEdit.trim()">
+            {{ editLoading ? 'Guardando...' : 'Guardar' }}
+          </ion-button>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </ion-content>
