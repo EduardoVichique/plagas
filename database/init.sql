@@ -122,8 +122,23 @@ ON CONFLICT (email) DO NOTHING;
 INSERT INTO guias (titulo, descripcion, tipo_plaga, informacion_tecnica) VALUES
 ('Pulgón en cultivos', 'Control y prevención del pulgón en hortalizas y cereales.', 'Pulgón', 'Aplicar jabón potásico o aceite de neem. Evitar exceso de nitrógeno. Favorecer fauna auxiliar (mariquitas).'),
 ('Mildiu en vid', 'Identificación y tratamiento del mildiu en viñedos.', 'Mildiu', 'Fungicidas cúpricos preventivos. Buena ventilación. Eliminar restos infectados.'),
-('Mosca blanca', 'Manejo integrado de mosca blanca en invernaderos.', 'Mosca blanca', 'Trampas cromáticas amarillas. Control biológico con Encarsia. Evitar estrés hídrico.')
-;
+('Mosca blanca', 'Manejo integrado de mosca blanca en invernaderos.', 'Mosca blanca', 'Trampas cromáticas amarillas. Control biológico con Encarsia. Evitar estrés hídrico.');
+
+-- Datos iniciales: reportes epidemiológicos en México para el mapa de calor
+INSERT INTO reportes (usuario_id, titulo, descripcion, latitud, longitud, estado, tipo_plaga) VALUES
+(1, 'Brote de Pulgón verde', 'Alta infestación observada en cultivo de maíz en Culiacán', 24.80910000, -107.39400000, 'Pendiente', 'Pulgón'),
+(1, 'Presencia de Mildiu en parcela', 'Hojas amarillentas y moho en viñedo cerca de Ensenada', 31.86670000, -116.59640000, 'En revisión', 'Mildiu'),
+(1, 'Mosca blanca en invernadero', 'Alta densidad de mosca blanca en tomate en Zamora', 19.98330000, -102.28330000, 'Pendiente', 'Mosca blanca'),
+(1, 'Gusano cogollero detectado', 'Daño severo en follaje de maíz en Celaya', 20.52390000, -100.81570000, 'Confirmado', 'Gusano cogollero'),
+(1, 'Foco de Pulgón en cítricos', 'Infestación moderada en hortalizas en Martínez de la Torre', 20.06330000, -97.05470000, 'Resuelto', 'Pulgón'),
+(1, 'Mosca de la fruta en mango', 'Presencia de larva en cultivos de mango en Tapachula', 14.90420000, -92.26250000, 'Pendiente', 'Mosca de la fruta'),
+(1, 'Mildiu en cultivo de papa', 'Manchas foliares marrón oscuras en Toluca', 19.28260000, -99.65570000, 'En revisión', 'Mildiu'),
+(1, 'Mosca blanca en calabacita', 'Alta presencia de vectores en valle de Ciudad Obregón', 27.48630000, -109.94080000, 'Confirmado', 'Mosca blanca'),
+(1, 'Pulgón negro en aguacate', 'Infestación inicial en huerta orgánica en Uruapan', 19.41440000, -102.05250000, 'Pendiente', 'Pulgón'),
+(1, 'Gusano soldado en sorgo', 'Afectación parcelaria en Matamoros', 25.86940000, -97.50280000, 'Resuelto', 'Gusano cogollero'),
+(1, 'Mildiu velloso en hortalizas', 'Foco infeccioso post-lluvia en Tehuacán', 18.46060000, -97.39270000, 'Pendiente', 'Mildiu'),
+(1, 'Pulgón amarillo en caña', 'Foco de alerta fitosanitaria en Córdoba', 18.89420000, -96.93530000, 'Confirmado', 'Pulgón')
+ON CONFLICT (id) DO NOTHING;
 
 COMMENT ON TABLE usuarios IS 'Usuarios del sistema PlagaControl';
 COMMENT ON TABLE reportes IS 'Reportes de plagas con ubicación GPS y foto';

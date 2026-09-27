@@ -1,13 +1,110 @@
+.filter-card {
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 #map {
   width: 100%;
-  height: 400px;
-  border-radius: var(--plaga-card-radius);
+  height: 520px;
   background: #e8f5e9;
+  z-index: 1;
+
   &.loaded {
-    min-height: 400px;
+    min-height: 520px;
   }
 }
 
-:host ::ng-deep .leaflet-tile-pane {
-  z-index: 0;
+.map-overlay-status {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 18px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
+  min-width: 220px;
+}
+
+.heatmap-legend {
+  .legend-box {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+
+    &.low {
+      background: #ffeb3b;
+      border: 1px solid #e0e0e0;
+    }
+    &.mid {
+      background: #ff9800;
+    }
+    &.high {
+      background: #d32f2f;
+    }
+  }
+
+  .legend-label {
+    font-size: 0.75rem;
+    color: #444;
+    margin-right: 8px;
+    font-weight: 500;
+  }
+}
+
+:host ::ng-deep {
+  .leaflet-tile-pane {
+    z-index: 0;
+  }
+
+  .leaflet-overlay-pane {
+    z-index: 4;
+  }
+
+  .heat-zone-label-icon {
+    background: transparent;
+    border: none;
+  }
+
+  .heat-zone-box {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #111111;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #111111;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+    margin: 0 auto;
+  }
+
+  .map-popup-card {
+    min-width: 160px;
+    padding: 2px;
+
+    h6 {
+      color: #2d6a4f;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.25em 0.5em;
+    }
+  }
 }

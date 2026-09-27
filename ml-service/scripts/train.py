@@ -163,6 +163,12 @@ def evaluate_model(model, X_val, y_val_cat, y_val):
 def main():
     start_time = time.time()
     
+    model_file = os.path.join(STATIC_DIR, 'best_model.keras')
+    metrics_file = os.path.join(STATIC_DIR, 'metrics.json')
+    if os.path.exists(model_file) and os.path.exists(metrics_file):
+        print(f"[ML-TRAIN] Modelo y métricas pre-existentes encontrados en '{STATIC_DIR}'. Omitiendo entrenamiento.")
+        return
+        
     # 1. Generar Dataset
     X_train, y_train, X_val, y_val = create_dataset(150)
     

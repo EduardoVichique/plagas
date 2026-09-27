@@ -12,16 +12,18 @@ const getImageUrl = (req, filename) => {
 
 exports.listar = async (req, res, next) => {
   try {
-    const { estado, usuario_id, limit = 50, offset = 0 } = req.query;
+    const { estado, tipo_plaga, usuario_id, limit = 50, offset = 0 } = req.query;
     const where = {};
     if (estado) where.estado = estado;
+    if (tipo_plaga) where.tipo_plaga = tipo_plaga;
     if (usuario_id) where.usuario_id = parseInt(usuario_id, 10);
     
+    const maxLimit = Math.min(parseInt(limit, 10) || 50, 500);
     const { count, rows } = await db.Reporte.findAndCountAll({
       where,
       include: [{ model: db.Usuario, as: 'Usuario', attributes: ['id', 'nombre', 'apellido', 'avatar_url'] }],
       order: [['created_at', 'DESC']],
-      limit: Math.min(parseInt(limit, 10) || 50, 100),
+      limit: maxLimit,
       offset: parseInt(offset, 10) || 0,
     });
 

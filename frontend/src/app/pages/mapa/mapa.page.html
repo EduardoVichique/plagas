@@ -1,13 +1,124 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Mapa de reportes</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>Mapa Epidemiológico</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="resetearCentroMexico()" title="Centrar en México">
+        <ion-icon name="locate-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="cargarReportes()" title="Actualizar datos">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
 <ion-content class="ion-padding">
-  <div *ngIf="loading" class="text-center py-3">
-    <ion-spinner></ion-spinner>
-    <p class="small">Cargando reportes...</p>
+  <!-- Controles y Filtros -->
+  <div class="card p-3 mb-3 filter-card shadow-sm">
+    <div class="row g-2 align-items-center">
+      <!-- Selector de Modo de Vista -->
+      <div class="col-12 col-md-4">
+        <label class="form-label small text-muted mb-1">Visualización</label>
+        <div class="btn-group w-100" role="group">
+          <button
+            type="button"
+            class="btn btn-outline-success btn-sm"
+            [class.active]="modoVista === 'calor'"
+            (click)="cambiarModoVista('calor')"
+          >
+            🔥 Calor
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-success btn-sm"
+            [class.active]="modoVista === 'marcadores'"
+            (click)="cambiarModoVista('marcadores')"
+          >
+            📍 Puntos
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-success btn-sm"
+            [class.active]="modoVista === 'ambos'"
+            (click)="cambiarModoVista('ambos')"
+          >
+            🗺️ Ambos
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtro Tipo de Plaga -->
+      <div class="col-6 col-md-4">
+        <label class="form-label small text-muted mb-1">Tipo de Plaga</label>
+        <select
+          class="form-select form-select-sm"
+          [(ngModel)]="tipoPlagaSeleccionada"
+          (change)="aplicarFiltros()"
+        >
+          <option *ngFor="let plaga of tiposPlagaDisponibles" [value]="plaga">
+            {{ plaga }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Filtro Estado -->
+      <div class="col-6 col-md-4">
+        <label class="form-label small text-muted mb-1">Estado Fitosanitario</label>
+        <select
+          class="form-select form-select-sm"
+          [(ngModel)]="estadoSeleccionado"
+          (change)="aplicarFiltros()"
+        >
+          <option *ngFor="let est of estadosDisponibles" [value]="est">
+            {{ est }}
+          </option>
+        </select>
+      </div>
+    </div>
   </div>
-  <div #mapContainer id="map" class="map-container" [class.loaded]="!loading"></div>
-  <p class="small text-muted mt-2 mb-0">{{ reportes.length }} reportes con ubicación en el mapa</p>
+
+  <!-- Contenedor del Mapa -->
+  <div class="map-wrapper shadow-sm rounded">
+    <div #mapContainer id="map" class="map-container" [class.loaded]="!loading"></div>
+
+    <!-- Indicador de Carga -->
+    <div *ngIf="loading" class="map-overlay-status text-center">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p class="small text-muted mt-2 mb-0">Cargando mapa epidemiológico...</p>
+    </div>
+
+    <!-- Error de Carga -->
+    <div *ngIf="!loading && errorCarga" class="map-overlay-status text-center text-danger">
+      <ion-icon name="alert-circle-outline" style="font-size: 2.5rem;"></ion-icon>
+      <p class="small fw-bold mt-1 mb-2">No se pudieron cargar los datos del mapa</p>
+      <button class="btn btn-sm btn-outline-danger" (click)="cargarReportes()">Reintentar</button>
+    </div>
+
+    <!-- Estado Sin Datos -->
+    <div
+      *ngIf="!loading && !errorCarga && reportesFiltrados.length === 0"
+      class="map-overlay-status text-center text-muted"
+    >
+      <ion-icon name="search-outline" style="font-size: 2.5rem;"></ion-icon>
+      <p class="small fw-bold mt-1 mb-0">Sin datos epidemiológicos para los filtros seleccionados</p>
+    </div>
+  </div>
+
+  <!-- Barra de Leyenda e Información Fitosanitaria -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between mt-2 px-1">
+    <div class="small text-muted">
+      <strong>{{ reportesFiltrados.length }}</strong> reportes registrados en la zona (de {{ reportes.length }} totales)
+    </div>
+
+    <!-- Leyenda de Calor -->
+    <div *ngIf="modoVista !== 'marcadores'" class="heatmap-legend d-flex align-items-center gap-1 small">
+      <span class="text-muted me-1">Intensidad:</span>
+      <span class="legend-box low" title="Riesgo Bajo / Resuelto"></span>
+      <span class="legend-label">Bajo</span>
+      <span class="legend-box mid" title="Riesgo Medio / Pendiente"></span>
+      <span class="legend-label">Medio</span>
+      <span class="legend-box high" title="Riesgo Alto / Confirmado"></span>
+      <span class="legend-label">Alto</span>
+    </div>
+  </div>
 </ion-content>

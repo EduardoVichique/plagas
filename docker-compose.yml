@@ -66,6 +66,7 @@ services:
       UPLOAD_PATH: /app/uploads
     volumes:
       - backend_uploads:/app/uploads
+      - ml_static:/app/static
     ports:
       - "8000:8000"
     depends_on:
@@ -93,6 +94,7 @@ services:
 volumes:
   postgres_data:
   backend_uploads:
+  ml_static:
 
 
 networks:

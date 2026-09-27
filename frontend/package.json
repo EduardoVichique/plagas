@@ -36,12 +36,13 @@
     "zone.js": "~0.14.0"
   },
   "devDependencies": {
-    "patch-package": "^8.0.0",
     "@angular-devkit/build-angular": "~17.3.0",
     "@angular/cli": "~17.3.0",
     "@angular/compiler-cli": "~17.3.0",
+    "@capacitor/cli": "^5.7.8",
     "@ionic/angular-toolkit": "^10.0.0",
     "@types/leaflet": "^1.9.8",
+    "patch-package": "^8.0.0",
     "typescript": "~5.4.0"
   },
   "capacitor": {
