@@ -10,6 +10,7 @@
 .env.production
 .env.local
 .env.*.local
+!.env.example
 
 # ---------------------------------------------------------------------------
 # Dependencias de Node.js
@@ -68,3 +69,25 @@ build.log
 *.tmp
 *.temp
 dist/
+
+# ---------------------------------------------------------------------------
+# ML Service (modelos generados en Docker build, no subir al repo)
+# ---------------------------------------------------------------------------
+ml-service/static/best_model.*
+ml-service/static/metrics.json
+ml-service/static/*.png
+ml-service/__pycache__/
+ml-service/app/__pycache__/
+ml-service/scripts/__pycache__/
+ml-service/venv/
+ml-service/uploads/*
+
+# ---------------------------------------------------------------------------
+# Capacitor / Android (generado con npx cap add android)
+# ---------------------------------------------------------------------------
+frontend/android/
+
+# ---------------------------------------------------------------------------
+# IDE Config
+# ---------------------------------------------------------------------------
+pyrightconfig.json

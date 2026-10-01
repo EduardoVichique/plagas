@@ -13,6 +13,9 @@ class Config:
     
     JWT_SECRET = os.getenv("JWT_SECRET", "plagacontrol-jwt-secret-change-in-production")
     
+    # SSL para conexión a PostgreSQL (requerido por Neon.tech en cloud)
+    DB_SSL = os.getenv("DB_SSL", "false").lower() == "true"
+    
     # Por defecto, en desarrollo local apunta al directorio de uploads del backend.
     # En Docker, se sobreescribe mediante variables de entorno a /app/uploads
     UPLOAD_PATH = os.getenv("UPLOAD_PATH", "../backend/uploads")

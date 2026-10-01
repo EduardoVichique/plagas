@@ -6,13 +6,16 @@ from app.config import Config
 logger = logging.getLogger(__name__)
 
 def get_connection():
-    return psycopg2.connect(
-        host=Config.DB_HOST,
-        port=Config.DB_PORT,
-        database=Config.DB_NAME,
-        user=Config.DB_USER,
-        password=Config.DB_PASSWORD
-    )
+    conn_params = {
+        'host': Config.DB_HOST,
+        'port': Config.DB_PORT,
+        'database': Config.DB_NAME,
+        'user': Config.DB_USER,
+        'password': Config.DB_PASSWORD,
+    }
+    if Config.DB_SSL:
+        conn_params['sslmode'] = 'require'
+    return psycopg2.connect(**conn_params)
 
 def check_db_health():
     try:

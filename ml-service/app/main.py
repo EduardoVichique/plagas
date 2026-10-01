@@ -11,7 +11,16 @@ from fastapi import FastAPI, File, UploadFile, Header, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
-import tensorflow as tf
+# Auto-detección: TensorFlow completo (local/Docker) o TFLite (cloud/Render)
+try:
+    import tensorflow as tf
+    USE_TFLITE = False
+except ImportError:
+    try:
+        import tflite_runtime.interpreter as tflite
+    except ImportError:
+        tflite = None
+    USE_TFLITE = True
 
 from app.config import Config
 from app.database import (
@@ -42,16 +51,19 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Cargar el modelo seleccionado en el inicio de la app
 MODEL_PATH = "static/best_model.keras"
+TFLITE_MODEL_PATH = "static/best_model.tflite"
 METRICS_PATH = "static/metrics.json"
 
 best_model = None
+tflite_interpreter = None
 metrics_data = None
 classes = ['Diatraea_saccharalis', 'Mahanarva_fimbriolata', 'Saccharicoccus_sacchari', 'Healthy']
 
 @app.on_event("startup")
 def load_assets():
-    global best_model, metrics_data
+    global best_model, tflite_interpreter, metrics_data
     logger.info("Iniciando servicio de Machine Learning...")
+    logger.info(f"Modo de inferencia: {'TFLite (ligero)' if USE_TFLITE else 'TensorFlow completo'}")
     
     # Intentar cargar métricas
     if os.path.exists(METRICS_PATH):
@@ -62,15 +74,27 @@ def load_assets():
         except Exception as e:
             logger.error(f"Error al cargar metrics.json: {e}")
             
-    # Intentar cargar modelo
-    if os.path.exists(MODEL_PATH):
-        try:
-            best_model = tf.keras.models.load_model(MODEL_PATH)
-            logger.info(f"Modelo {metrics_data.get('best_model', 'cargado')} inicializado correctamente.")
-        except Exception as e:
-            logger.error(f"Error al cargar el modelo de Keras: {e}")
+    # Cargar modelo según el modo disponible
+    if USE_TFLITE:
+        if os.path.exists(TFLITE_MODEL_PATH):
+            try:
+                tflite_interpreter = tflite.Interpreter(model_path=TFLITE_MODEL_PATH)
+                tflite_interpreter.allocate_tensors()
+                model_name = metrics_data.get('best_model', 'cargado') if metrics_data else 'cargado'
+                logger.info(f"Modelo {model_name} inicializado correctamente (TFLite).")
+            except Exception as e:
+                logger.error(f"Error al cargar el modelo TFLite: {e}")
+        else:
+            logger.warning(f"No se encontró el modelo TFLite en {TFLITE_MODEL_PATH}. Por favor ejecute train.py.")
     else:
-        logger.warning(f"No se encontró el archivo del modelo en {MODEL_PATH}. Por favor ejecute train.py.")
+        if os.path.exists(MODEL_PATH):
+            try:
+                best_model = tf.keras.models.load_model(MODEL_PATH)
+                logger.info(f"Modelo {metrics_data.get('best_model', 'cargado')} inicializado correctamente (TensorFlow).")
+            except Exception as e:
+                logger.error(f"Error al cargar el modelo de Keras: {e}")
+        else:
+            logger.warning(f"No se encontró el archivo del modelo en {MODEL_PATH}. Por favor ejecute train.py.")
 
 # Mapeo de recomendaciones y nombres estéticos
 RECOMENDACIONES = {
@@ -134,7 +158,7 @@ def verify_token(authorization: str = Header(None)):
 @app.get("/health")
 def health():
     db_ok = check_db_health()
-    model_loaded = best_model is not None
+    model_loaded = (tflite_interpreter is not None) if USE_TFLITE else (best_model is not None)
     
     status_code = 200 if (db_ok and model_loaded) else 500
     
@@ -179,8 +203,8 @@ async def predict(
     image: UploadFile = File(...),
     userId: int = Depends(verify_token)
 ):
-    global best_model
-    if not best_model:
+    model_ready = (tflite_interpreter is not None) if USE_TFLITE else (best_model is not None)
+    if not model_ready:
         raise HTTPException(
             status_code=503,
             detail={"success": False, "message": "El modelo de predicción no está cargado", "error": {}}
@@ -214,7 +238,14 @@ async def predict(
     
     # 3. Correr Inferencia
     try:
-        preds = best_model.predict(img_array)
+        if USE_TFLITE:
+            input_details = tflite_interpreter.get_input_details()
+            output_details = tflite_interpreter.get_output_details()
+            tflite_interpreter.set_tensor(input_details[0]['index'], img_array.astype(np.float32))
+            tflite_interpreter.invoke()
+            preds = [tflite_interpreter.get_tensor(output_details[0]['index'])[0]]
+        else:
+            preds = best_model.predict(img_array)
         class_idx = np.argmax(preds[0])
         prob = float(preds[0][class_idx])
         confianza_pct = round(prob * 100, 2)

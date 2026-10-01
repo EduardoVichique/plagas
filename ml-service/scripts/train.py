@@ -165,8 +165,19 @@ def main():
     
     model_file = os.path.join(STATIC_DIR, 'best_model.keras')
     metrics_file = os.path.join(STATIC_DIR, 'metrics.json')
+    tflite_file = os.path.join(STATIC_DIR, 'best_model.tflite')
     if os.path.exists(model_file) and os.path.exists(metrics_file):
-        print(f"[ML-TRAIN] Modelo y métricas pre-existentes encontrados en '{STATIC_DIR}'. Omitiendo entrenamiento.")
+        # Si falta el .tflite, generarlo a partir del .keras existente
+        if not os.path.exists(tflite_file):
+            print("[ML-TRAIN] Generando modelo TFLite a partir del modelo Keras existente...")
+            existing_model = tf.keras.models.load_model(model_file)
+            converter = tf.lite.TFLiteConverter.from_keras_model(existing_model)
+            tflite_data = converter.convert()
+            with open(tflite_file, 'wb') as f:
+                f.write(tflite_data)
+            print("[ML-TRAIN] Modelo TFLite generado exitosamente.")
+        else:
+            print(f"[ML-TRAIN] Modelo, métricas y TFLite pre-existentes en '{STATIC_DIR}'. Omitiendo entrenamiento.")
         return
         
     # 1. Generar Dataset
@@ -245,6 +256,14 @@ def main():
     
     # Guardar el mejor modelo
     best_model.save(os.path.join(STATIC_DIR, 'best_model.keras'))
+    
+    # Convertir a TFLite para despliegue ligero en cloud
+    print(f"Convirtiendo modelo {best_model_name} a formato TFLite...")
+    converter = tf.lite.TFLiteConverter.from_keras_model(best_model)
+    tflite_data = converter.convert()
+    with open(os.path.join(STATIC_DIR, 'best_model.tflite'), 'wb') as f:
+        f.write(tflite_data)
+    print("Modelo TFLite guardado exitosamente.")
     
     # 5. Generar Matriz de Confusión para el mejor modelo
     best_preds = validation_predictions[best_model_name]['preds']
