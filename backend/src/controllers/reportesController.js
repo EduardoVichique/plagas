@@ -4,10 +4,15 @@
 const db = require('../models');
 const path = require('path');
 
+const getBaseUrl = (req) => {
+  if (process.env.API_URL) return process.env.API_URL.replace(/\/$/, '');
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+  return `${protocol}://${req.get('host')}`;
+};
+
 const getImageUrl = (req, filename) => {
-  const baseUrl = process.env.API_URL || 'http://localhost:3000';
   if (!filename) return null;
-  return `${baseUrl}/uploads/reportes/${path.basename(filename)}`;
+  return `${getBaseUrl(req)}/uploads/reportes/${path.basename(filename)}`;
 };
 
 exports.listar = async (req, res, next) => {

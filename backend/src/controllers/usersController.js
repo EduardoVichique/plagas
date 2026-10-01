@@ -79,7 +79,8 @@ exports.actualizarPerfil = async (req, res, next) => {
     if (tipo_cultivo !== undefined) usuario.tipo_cultivo = tipo_cultivo;
     
     if (req.file && req.file.path) {
-      const baseUrl = process.env.API_URL || 'http://localhost:3000';
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+      const baseUrl = process.env.API_URL || `${protocol}://${req.get('host')}`;
       usuario.avatar_url = `${baseUrl}/uploads/avatars/${req.file.filename}`;
     }
 
