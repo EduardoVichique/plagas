@@ -24,6 +24,11 @@ async function waitForDb() {
 async function start() {
   await waitForDb();
   console.log('Base de datos PostgreSQL conectada.');
+
+  // Sincronizar modelos con la base de datos (crea las tablas si no existen)
+  await db.sequelize.sync();
+  console.log('Tablas de la base de datos sincronizadas correctamente.');
+
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`PlagaControl API escuchando en http://0.0.0.0:${PORT}`);
   });
