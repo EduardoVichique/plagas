@@ -7,7 +7,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration=production",
+    "build": "node ./node_modules/@angular/cli/bin/ng.js build --configuration=production",
     "postinstall": "node ./node_modules/patch-package/index.js || true",
     "watch": "ng build --watch --configuration=development",
     "test": "ng test",
