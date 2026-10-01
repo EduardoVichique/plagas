@@ -22,6 +22,9 @@ const app = express();
 // Confiar en proxy si se despliega en Render o similar
 app.set('trust proxy', 1);
 
+// Habilitar CORS al inicio para todas las peticiones (incluyendo preflight OPTIONS)
+app.use(cors({ origin: true, credentials: true }));
+
 // Limitador de peticiones generales
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
@@ -48,14 +51,6 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Redirección HTTP -> HTTPS en producción
-app.use((req, res, next) => {
-  if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
-    return res.redirect(`https://${req.get('host')}${req.url}`);
-  }
-  next();
-});
-
 // Seguridad de headers de HTTP
 app.use(helmet());
 
@@ -66,7 +61,6 @@ app.use('/api/auth', authLimiter);
 // Logging de auditoría
 app.use(auditMiddleware);
 
-app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
