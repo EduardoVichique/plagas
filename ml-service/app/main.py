@@ -232,6 +232,7 @@ async def predict(
     filename = f"pred-{userId}-{int(time.time()*1000)}{ext}"
     dest_path = os.path.join(Config.get_predictions_dir(), filename)
     pil_img.save(dest_path)
+    logger.info(f"Imagen de predicción guardada correctamente en: {dest_path}")
     
     # URL de acceso relativo para mostrar en el frontend
     imagen_url = f"/uploads/predictions/{filename}"

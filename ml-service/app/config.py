@@ -18,7 +18,7 @@ class Config:
     
     # Por defecto, en desarrollo local apunta al directorio de uploads del backend.
     # En Docker, se sobreescribe mediante variables de entorno a /app/uploads
-    UPLOAD_PATH = os.getenv("UPLOAD_PATH", "../backend/uploads")
+    UPLOAD_PATH = os.getenv("UPLOAD_PATH", "uploads")
     
     @classmethod
     def get_predictions_dir(cls):
