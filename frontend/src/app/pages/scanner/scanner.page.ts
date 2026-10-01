@@ -137,10 +137,18 @@ export class ScannerPage implements OnInit {
   }
 
   resolveImageUrl(path: string): string {
-    if (!path) return 'assets/images/placeholder.png';
+    if (!path) return 'assets/icon/logo.png';
     if (path.startsWith('http')) return path;
-    const baseUrl = environment.apiUrl.replace('/api', '');
-    return `${baseUrl}${path}`;
+    
+    const cleanPath = path.replace(/^\/api\/ml/, '').replace(/^\/api/, '');
+
+    if (cleanPath.startsWith('/static') || cleanPath.startsWith('/uploads/predictions')) {
+      const mlBase = environment.mlApiUrl.replace(/\/$/, '');
+      return `${mlBase}${cleanPath.startsWith('/') ? '' : '/'}${cleanPath}`;
+    }
+
+    const backendBase = environment.apiUrl.replace(/\/api$/, '');
+    return `${backendBase}${cleanPath.startsWith('/') ? '' : '/'}${cleanPath}`;
   }
 
   private async presentToast(message: string, color: string = 'dark') {

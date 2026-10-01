@@ -49,6 +49,11 @@ app.add_middleware(
 os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Servir carpeta de predicciones subidas
+predictions_dir = Config.get_predictions_dir()
+os.makedirs(predictions_dir, exist_ok=True)
+app.mount("/uploads/predictions", StaticFiles(directory=predictions_dir), name="predictions")
+
 # Cargar el modelo seleccionado en el inicio de la app
 MODEL_PATH = "static/best_model.keras"
 TFLITE_MODEL_PATH = "static/best_model.tflite"
