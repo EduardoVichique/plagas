@@ -51,8 +51,11 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Seguridad de headers de HTTP
-app.use(helmet());
+// Seguridad de headers de HTTP (permitiendo acceso a recursos entre diferentes orígenes)
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginEmbedderPolicy: false,
+}));
 
 // Aplicar limitadores
 app.use(generalLimiter);
@@ -64,8 +67,12 @@ app.use(auditMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Archivos estáticos (imágenes subidas)
-app.use('/uploads', express.static(path.resolve(UPLOAD_DIR)));
+// Archivos estáticos (imágenes subidas) con permisos de origen cruzado explícitos
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.resolve(UPLOAD_DIR)));
 
 // API REST
 app.use('/api/auth', authRoutes);
