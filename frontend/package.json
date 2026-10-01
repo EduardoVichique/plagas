@@ -8,7 +8,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --configuration=production",
-    "postinstall": "patch-package",
+    "postinstall": "npx patch-package",
     "watch": "ng build --watch --configuration=development",
     "test": "ng test",
     "ionic:build": "ng build --configuration=production",
